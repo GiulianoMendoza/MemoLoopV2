@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">MemoLoop</string>
+    <string-array name="reminder_categories">
+        <item>Salud</item>
+        <item>Deporte</item>
+        <item>Ocio</item>
+        <item>Estudio</item>
+        <item>General</item>
+    </string-array>
+
+    <string-array name="reminder_frequencies">
+        <item>Eventual</item>
+        <item>Fijo</item>
+    </string-array>
+</resources>

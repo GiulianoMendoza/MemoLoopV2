@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
+    android:layout_marginBottom="8dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,32 +14,52 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tv_reminder_title"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Título del Recordatorio"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="4dp" />
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tv_reminder_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="32dp"
+                android:text="Título del Recordatorio"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <!-- Botón de opciones (tres puntitos) -->
+            <ImageButton
+                android:id="@+id/btn_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Opciones de recordatorio"
+                android:src="@drawable/ic_more_vert" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/tv_reminder_datetime"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Fecha: 01/01/2024 10:00"
+            android:text="Fecha: DD/MM/AAAA HH:MM"
             android:textSize="14sp"
-            android:textColor="?android:attr/textColorSecondary"
-            android:layout_marginBottom="4dp" />
+            android:textColor="?android:attr/textColorSecondary" />
 
         <TextView
-            android:id="@+id/tv_reminder_type"
-            android:layout_width="match_parent"
+            android:id="@+id/tv_reminder_details"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tipo: Eventual"
+            android:text="Tipo: Eventual - Categoría: General"
             android:textSize="14sp"
             android:textColor="?android:attr/textColorSecondary" />
 
     </LinearLayout>
 
-</com.google.android.material.card.MaterialCardView>
+</androidx.cardview.widget.CardView>

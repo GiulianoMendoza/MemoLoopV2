@@ -12,4 +12,19 @@
         <item>Eventual</item>
         <item>Fijo</item>
     </string-array>
+
+    <string-array name="filter_categories">
+        <item>Todas las Categorías</item>
+        <item>Salud</item>
+        <item>Deporte</item>
+        <item>Ocio</item>
+        <item>Estudio</item>
+        <item>General</item>
+    </string-array>
+
+    <string-array name="filter_frequencies">
+        <item>Todas las Frecuencias</item>
+        <item>Eventual</item>
+        <item>Fijo</item>
+    </string-array>
 </resources>

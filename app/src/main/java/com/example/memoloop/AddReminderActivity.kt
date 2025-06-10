@@ -15,13 +15,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class AddReminderActivity : AppCompatActivity() {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
-
     private lateinit var etReminderTitle: EditText
     private lateinit var tvSelectedDate: TextView
     private lateinit var tvSelectedTime: TextView
@@ -37,23 +35,17 @@ class AddReminderActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_add_reminders)
-
         val toolbar: Toolbar = findViewById(R.id.toolbar_main)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Agregar Recordatorio"
-
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
-
         initViews()
-        setupSpinners()
         setupClickListeners()
     }
-
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
@@ -71,9 +63,6 @@ class AddReminderActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progress_bar)
     }
 
-    private fun setupSpinners() {
-    }
-
     private fun setupClickListeners() {
         btnSelectDate.setOnClickListener {
             showDatePicker()
@@ -87,7 +76,6 @@ class AddReminderActivity : AppCompatActivity() {
             addReminder()
         }
     }
-
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
         val datePickerDialog = DatePickerDialog(
@@ -140,7 +128,6 @@ class AddReminderActivity : AppCompatActivity() {
             tvSelectedTime.text = "Hora: ${timeFormat.format(time.time)}"
         }
     }
-
     private fun addReminder() {
         val title = etReminderTitle.text.toString().trim()
         val selectedCategory = spinnerCategory.selectedItem.toString()
@@ -195,7 +182,7 @@ class AddReminderActivity : AppCompatActivity() {
                     param("reminder_type", newReminder.type)
                     param("reminder_category", newReminder.category)
                 }
-                finish() // Cierra AddReminderActivity y regresa a RemindersActivity (o la que la llamó)
+                finish()
             }
             .addOnFailureListener { e ->
                 setLoadingState(false)
@@ -203,7 +190,6 @@ class AddReminderActivity : AppCompatActivity() {
                 Log.e("AddReminderActivity", "Error adding reminder", e)
             }
     }
-
     private fun clearForm() {
         etReminderTitle.text.clear()
         selectedDate = null
@@ -213,7 +199,6 @@ class AddReminderActivity : AppCompatActivity() {
         spinnerCategory.setSelection(0)
         spinnerFrequency.setSelection(0)
     }
-
     private fun setLoadingState(isLoading: Boolean) {
         btnAddReminder.isEnabled = !isLoading
         progressBar.isVisible = isLoading

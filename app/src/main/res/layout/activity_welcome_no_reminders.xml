@@ -22,7 +22,6 @@
             app:title="MemoLoop" />
 
     </com.google.android.material.appbar.AppBarLayout>
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -34,7 +33,6 @@
             android:orientation="vertical"
             android:padding="24dp"
             android:gravity="center_horizontal">
-
             <TextView
                 android:id="@+id/tv_welcome_message_dynamic"
                 android:layout_width="wrap_content"
@@ -45,14 +43,12 @@
                 android:textStyle="bold"
                 android:textColor="?android:attr/textColorPrimary"
                 tools:text="Bienvenido [Nombre del Usuario] a MemoLoop, tu app de recordatorios" />
-
             <ImageView
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_marginTop="64dp"
                 android:src="@drawable/sinrecordatorio"
                 android:contentDescription="Ícono de recordatorios vacíos" />
-
             <TextView
                 android:id="@+id/tv_no_reminders_info_dynamic"
                 android:layout_width="wrap_content"
@@ -62,7 +58,6 @@
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:textColor="?android:attr/textColorSecondary" />
-
             <ProgressBar
                 android:id="@+id/progress_bar_welcome_dynamic"
                 android:layout_width="wrap_content"
@@ -73,7 +68,6 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_reminder_dynamic"
         android:layout_width="wrap_content"

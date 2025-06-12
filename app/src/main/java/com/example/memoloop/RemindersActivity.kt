@@ -32,8 +32,11 @@ data class Reminder(
     val title: String = "",
     val timestamp: Long = 0L,
     val type: String = "",
-    val category: String = ""
-)
+    val category: String = "",
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val imageUrl: String? = null,
+    )
 
 class RemindersActivity : AppCompatActivity(), RemindersAdapter.OnReminderOptionsClickListener {
 

@@ -2,9 +2,12 @@ package com.example.memoloop
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
+import android.app.Activity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
@@ -32,6 +35,9 @@ class AddReminderActivity : AppCompatActivity() {
 
     private var selectedDate: Calendar? = null
     private var selectedTime: Calendar? = null
+    private var selectedLatitude: Double? = null
+    private var selectedLongitude: Double? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +67,12 @@ class AddReminderActivity : AppCompatActivity() {
         spinnerFrequency = findViewById(R.id.spinner_frequency)
         btnAddReminder = findViewById(R.id.btn_add_reminder)
         progressBar = findViewById(R.id.progress_bar)
+
+        val btnSelectLocation: Button = findViewById(R.id.btn_select_location)
+        btnSelectLocation.setOnClickListener {
+            val intent = Intent(this, MapPickerActivity::class.java)
+            locationPicker.launch(intent)
+        }
     }
 
     private fun setupClickListeners() {
@@ -115,6 +127,36 @@ class AddReminderActivity : AppCompatActivity() {
         timePickerDialog.show()
     }
 
+    //Ubacion
+    private val locationPicker = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            if (data != null) {
+                Log.d("AddReminderActivity", "Datos recibidos del mapa: $data")
+                if (data.hasExtra("latitude") && data.hasExtra("longitude")) {
+                    selectedLatitude = data.getDoubleExtra("latitude", Double.NaN)
+                    selectedLongitude = data.getDoubleExtra("longitude", Double.NaN)
+
+                    if (!selectedLatitude!!.isNaN() && !selectedLongitude!!.isNaN()) {
+                        Toast.makeText(this, "Ubicación guardada", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Error al recibir la ubicación", Toast.LENGTH_SHORT).show()
+                        selectedLatitude = null
+                        selectedLongitude = null
+                    }
+                } else {
+                    Toast.makeText(this, "No se recibieron coordenadas", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this, "No se recibieron datos del mapa", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(this, "Operación cancelada", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun updateDateDisplay() {
         selectedDate?.let { date ->
             val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -165,7 +207,9 @@ class AddReminderActivity : AppCompatActivity() {
             title = title,
             timestamp = reminderCalendar.timeInMillis,
             type = selectedFrequency,
-            category = selectedCategory
+            category = selectedCategory,
+            latitude = selectedLatitude,
+            longitude = selectedLongitude
         )
 
         firestore.collection("users").document(userId).collection("reminders")

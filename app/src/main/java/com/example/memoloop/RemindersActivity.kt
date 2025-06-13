@@ -32,6 +32,7 @@ data class Reminder(
     val title: String = "",
     val timestamp: Long = 0L,
     val type: String = "",
+    val frequency:String = "",
     val category: String = "",
     val latitude: Double? = null,
     val longitude: Double? = null,

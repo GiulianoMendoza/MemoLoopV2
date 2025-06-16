@@ -2,11 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="reminder_type_salud">#de8f18</color>
-    <color name="reminder_type_deporte">#f4a261</color>
-    <color name="reminder_type_ocio">#e76f51</color>
-    <color name="reminder_type_estudio">#2a9d8f</color>
-    <color name="reminder_type_general">#8d99ae</color>
+    <color name="reminder_category_salud">#de8f18</color>
+    <color name="reminder_category_deporte">#f4a261</color>
+    <color name="reminder_category_ocio">#e76f51</color>
+    <color name="reminder_category_estudio">#2a9d8f</color>
+    <color name="reminder_category_general">#8d99ae</color>
 
 
 </resources>

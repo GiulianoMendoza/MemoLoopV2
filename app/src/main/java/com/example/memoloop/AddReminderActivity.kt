@@ -29,7 +29,7 @@ class AddReminderActivity : AppCompatActivity() {
     private lateinit var btnSelectDate: Button
     private lateinit var btnSelectTime: Button
     private lateinit var spinnerCategory: Spinner
-    private lateinit var spinnerFrequency: Spinner
+    private lateinit var spinnerType: Spinner
     private lateinit var btnAddReminder: Button
     private lateinit var progressBar: ProgressBar
 
@@ -64,7 +64,7 @@ class AddReminderActivity : AppCompatActivity() {
         btnSelectDate = findViewById(R.id.btn_select_date)
         btnSelectTime = findViewById(R.id.btn_select_time)
         spinnerCategory = findViewById(R.id.spinner_category)
-        spinnerFrequency = findViewById(R.id.spinner_frequency)
+        spinnerType = findViewById(R.id.spinner_type)
         btnAddReminder = findViewById(R.id.btn_add_reminder)
         progressBar = findViewById(R.id.progress_bar)
 
@@ -173,7 +173,7 @@ class AddReminderActivity : AppCompatActivity() {
     private fun addReminder() {
         val title = etReminderTitle.text.toString().trim()
         val selectedCategory = spinnerCategory.selectedItem.toString()
-        val selectedFrequency = spinnerFrequency.selectedItem.toString()
+        val selectedType = spinnerType.selectedItem.toString()
         val userId = auth.currentUser?.uid
 
         if (title.isEmpty() || selectedDate == null || selectedTime == null) {
@@ -206,7 +206,7 @@ class AddReminderActivity : AppCompatActivity() {
             userId = userId,
             title = title,
             timestamp = reminderCalendar.timeInMillis,
-            type = selectedFrequency,
+            type = selectedType,
             category = selectedCategory,
             latitude = selectedLatitude,
             longitude = selectedLongitude
@@ -241,7 +241,7 @@ class AddReminderActivity : AppCompatActivity() {
         tvSelectedDate.text = "Fecha: Seleccionar"
         tvSelectedTime.text = "Hora: Seleccionar"
         spinnerCategory.setSelection(0)
-        spinnerFrequency.setSelection(0)
+        spinnerType.setSelection(0)
     }
     private fun setLoadingState(isLoading: Boolean) {
         btnAddReminder.isEnabled = !isLoading

@@ -46,14 +46,14 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:id="@+id/iv_frequency_icon"
+                    android:id="@+id/iv_type_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
                     app:tint="#CC000000"/>
 
                 <ImageView
-                    android:id="@+id/iv_type_icon"
+                    android:id="@+id/iv_category_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
@@ -130,7 +130,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_frequency_label"
+                    android:id="@+id/tv_type_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="FRECUENCIA"
@@ -139,7 +139,7 @@
                     android:textStyle="bold"/>
 
                 <TextView
-                    android:id="@+id/tv_frequency"
+                    android:id="@+id/tv_type"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/black"
@@ -156,7 +156,7 @@
                 android:gravity="end">
 
                 <TextView
-                    android:id="@+id/tv_type_label"
+                    android:id="@+id/tv_category_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="TIPO"
@@ -165,7 +165,7 @@
                     android:textStyle="bold"/>
 
                 <TextView
-                    android:id="@+id/tv_type"
+                    android:id="@+id/tv_category"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/black"

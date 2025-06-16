@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,37 +14,31 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MemoLoop"
         tools:targetApi="31">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MemoLoop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- LoginActivity -->
+        </activity> <!-- LoginActivity -->
         <activity
             android:name=".LoginActivity"
             android:exported="false"
             android:theme="@style/Theme.MemoLoop"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- RegisterActivity -->
+            android:windowSoftInputMode="adjustResize" /> <!-- RegisterActivity -->
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
             android:theme="@style/Theme.MemoLoop"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- WelcomeActivity -->
+            android:windowSoftInputMode="adjustResize" /> <!-- WelcomeActivity -->
         <activity
             android:name=".WelcomeActivity"
             android:exported="false"
-            android:theme="@style/Theme.MemoLoop" />
-
-        <!-- RemindersActivity -->
+            android:theme="@style/Theme.MemoLoop" /> <!-- RemindersActivity -->
         <activity
             android:name=".RemindersActivity"
             android:exported="false"
@@ -52,13 +48,16 @@
             android:name=".AddReminderActivity"
             android:exported="false"
             android:theme="@style/Theme.MemoLoop"
-            android:windowSoftInputMode="adjustResize" />
-        <!-- MapPickerActivity -->
+            android:windowSoftInputMode="adjustResize" /> <!-- MapPickerActivity -->
         <activity
             android:name=".MapPickerActivity"
             android:exported="false"
             android:theme="@style/Theme.MemoLoop"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ReminderDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MemoLoop"/>
     </application>
 
 </manifest>

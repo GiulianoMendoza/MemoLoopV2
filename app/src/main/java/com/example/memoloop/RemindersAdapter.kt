@@ -1,9 +1,9 @@
 package com.example.memoloop
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
@@ -24,14 +24,14 @@ class RemindersAdapter(
     class ReminderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: CardView = itemView.findViewById(R.id.card_reminder)
         val tvTitle: TextView = itemView.findViewById(R.id.tv_reminder_title)
+        val ivCategoryIcon: ImageView = itemView.findViewById(R.id.iv_category_icon)
         val ivTypeIcon: ImageView = itemView.findViewById(R.id.iv_type_icon)
-        val ivFrequencyIcon: ImageView = itemView.findViewById(R.id.iv_frequency_icon)
         val tvDate: TextView = itemView.findViewById(R.id.tv_reminder_date)
         val tvTime: TextView = itemView.findViewById(R.id.tv_reminder_time)
-        val tvFrequencyLabel: TextView = itemView.findViewById(R.id.tv_frequency_label)
-        val tvFrequency: TextView = itemView.findViewById(R.id.tv_frequency)
         val tvTypeLabel: TextView = itemView.findViewById(R.id.tv_type_label)
         val tvType: TextView = itemView.findViewById(R.id.tv_type)
+        val tvCategoryLabel: TextView = itemView.findViewById(R.id.tv_category_label)
+        val tvCategory: TextView = itemView.findViewById(R.id.tv_category)
     }
 
 
@@ -51,24 +51,24 @@ class RemindersAdapter(
         val dateFormat = SimpleDateFormat("EEE, d MMM yyyy", Locale.getDefault())
         val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
-        val typeLower = reminder.type.lowercase(Locale.getDefault())
+        val categoryLower = reminder.category.lowercase(Locale.getDefault())
 
-        val colorRes = when (typeLower) {
-            "salud" -> R.color.reminder_type_salud
-            "deporte" -> R.color.reminder_type_deporte
-            "ocio" -> R.color.reminder_type_ocio
-            "estudio" -> R.color.reminder_type_estudio
-            "general" -> R.color.reminder_type_general
-            else -> R.color.reminder_type_general
+        val colorRes = when (categoryLower) {
+            "salud" -> R.color.reminder_category_salud
+            "deporte" -> R.color.reminder_category_deporte
+            "ocio" -> R.color.reminder_category_ocio
+            "estudio" -> R.color.reminder_category_estudio
+            "general" -> R.color.reminder_category_general
+            else -> R.color.reminder_category_general
         }
 
-        val iconRes = when (typeLower) {
-            "salud" -> R.drawable.ic_type_salud
-            "deporte" -> R.drawable.ic_type_deporte
-            "ocio" -> R.drawable.ic_type_ocio
-            "estudio" -> R.drawable.ic_type_estudio
-            "general" -> R.drawable.ic_type_general
-            else -> R.drawable.ic_type_general
+        val iconRes = when (categoryLower) {
+            "salud" -> R.drawable.ic_category_salud
+            "deporte" -> R.drawable.ic_category_deporte
+            "ocio" -> R.drawable.ic_category_ocio
+            "estudio" -> R.drawable.ic_category_estudio
+            "general" -> R.drawable.ic_category_general
+            else -> R.drawable.ic_category_general
         }
 
         val iconFrequency = when (reminder.frequency) {
@@ -79,17 +79,29 @@ class RemindersAdapter(
 
 
         holder.cardView.setCardBackgroundColor(context.getColor(colorRes))
-        holder.ivTypeIcon.setImageResource(iconRes)
-        holder.ivFrequencyIcon.setImageResource(iconFrequency)
+        holder.ivCategoryIcon.setImageResource(iconRes)
+        holder.ivTypeIcon.setImageResource(iconFrequency)
 
         holder.tvDate.text = "${dateFormat.format(calendar.time)}"
         holder.tvTime.text = "${timeFormat.format(calendar.time)}"
 
-        holder.tvFrequencyLabel.text = "FRECUENCIA"
-        holder.tvFrequency.text = reminder.frequency.replaceFirstChar { it.uppercaseChar() }
+        holder.tvTypeLabel.text = "FRECUENCIA"
+        holder.tvType.text = reminder.frequency.replaceFirstChar { it.uppercaseChar() }
 
-        holder.tvTypeLabel.text = "TIPO"
-        holder.tvType.text = reminder.type.replaceFirstChar { it.uppercaseChar() }
+        holder.tvCategoryLabel.text = "TIPO"
+        holder.tvCategory.text = reminder.category.replaceFirstChar { it.uppercaseChar() }
+
+        holder.cardView.setOnClickListener {
+            val intent = Intent(context, ReminderDetailActivity::class.java).apply {
+                putExtra("title", reminder.title)
+                putExtra("category", reminder.category)
+                putExtra("frequency", reminder.frequency)
+                putExtra("timestamp", reminder.timestamp)
+                putExtra("REMINDER_ID", reminder.id)
+            }
+            context.startActivity(intent)
+        }
+
 
     }
 

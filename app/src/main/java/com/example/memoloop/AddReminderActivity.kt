@@ -4,14 +4,16 @@ import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import android.app.Activity
+import android.net.Uri
+import android.content.Context
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
@@ -22,6 +24,18 @@ import com.google.firebase.analytics.logEvent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+
+import com.example.memoloop.ImgbbResponse
+import com.example.memoloop.network.ImgbbService
+
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,6 +51,7 @@ class AddReminderActivity : AppCompatActivity() {
     private lateinit var tvSelectedTime: TextView
     private lateinit var btnSelectDate: Button
     private lateinit var btnSelectTime: Button
+    private lateinit var btnSelectImage: Button
     private lateinit var spinnerCategory: Spinner
     private lateinit var spinnerType: Spinner
     private lateinit var btnAddReminder: Button
@@ -50,6 +65,7 @@ class AddReminderActivity : AppCompatActivity() {
     private var currentUserName: String = ""
     private var selectedLatitude: Double? = null
     private var selectedLongitude: Double? = null
+    private var selectedImageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,11 +81,12 @@ class AddReminderActivity : AppCompatActivity() {
         firestore = FirebaseFirestore.getInstance()
         notificationHelper = NotificationHelper(this)
 
-        loadCurrentUserName()
+
 
         initViews()
         setupSpinners()
         setupClickListeners()
+        loadCurrentUserName()
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -89,6 +106,9 @@ class AddReminderActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progress_bar)
         btnShareReminder = findViewById(R.id.btn_share_reminder)
         btnSelectLocation = findViewById(R.id.btn_select_location)
+        btnSelectImage = findViewById(R.id.btn_select_image)
+
+        val btnSelectLocation: Button = findViewById(R.id.btn_select_location)
         btnSelectLocation.setOnClickListener {
             val intent = Intent(this, MapPickerActivity::class.java)
             locationPicker.launch(intent)
@@ -118,6 +138,10 @@ class AddReminderActivity : AppCompatActivity() {
                     Log.e("AddReminderActivity", "Error loading current user name: ${e.message}", e)
                 }
         }
+        btnSelectImage.setOnClickListener {
+            imagePickerLauncher.launch("image/*")
+        }
+
     }
 
     private fun showDatePicker() {
@@ -183,6 +207,14 @@ class AddReminderActivity : AppCompatActivity() {
             }
         } else {
             Toast.makeText(this, "Operación cancelada", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private val imagePickerLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            selectedImageUri = uri
         }
     }
 
@@ -318,75 +350,107 @@ class AddReminderActivity : AppCompatActivity() {
                 set(Calendar.MILLISECOND, 0)
             }
         }
-        val newReminder = Reminder(
-            userId = userId,
-            title = title,
-            timestamp = reminderCalendar.timeInMillis,
-            type = selectedType, // Usa selectedType
-            category = selectedCategory,
-            sharedWith = sharedWithUserIds,
-            isShared = sharedWithUserIds.isNotEmpty(),
-            originalCreatorId = userId,
-            sharedFromUserName = currentUserName,
-            latitude = selectedLatitude,
-            longitude = selectedLongitude
-        )
 
-        firestore.collection("users").document(userId).collection("reminders")
-            .add(newReminder)
-            .addOnSuccessListener { documentReference ->
-                val reminderId = documentReference.id
-                firestore.collection("users").document(userId).collection("reminders")
-                    .document(reminderId)
-                    .set(newReminder.copy(id = reminderId), SetOptions.merge())
-                    .addOnSuccessListener {
-                        Log.d("AddReminderActivity", "Recordatorio con ID actualizado en Firestore: $reminderId")
-                        scheduleReminderNotification(newReminder.copy(id = reminderId), reminderId)
+        fun saveReminderToFirestore(imageUrl: String?) {
+            val reminder = Reminder(
+                userId = userId,
+                title = title,
+                timestamp = reminderCalendar.timeInMillis,
+                type = selectedType,
+                category = selectedCategory,
+                sharedWith = sharedWithUserIds,
+                isShared = sharedWithUserIds.isNotEmpty(),
+                originalCreatorId = userId,
+                sharedFromUserName = currentUserName,
+                latitude = selectedLatitude,
+                longitude = selectedLongitude,
+                imageUrl = imageUrl
+            )
 
-                        if (sharedWithUserIds.isNotEmpty()) {
-                            Log.d("AddReminderActivity", "Attempting to send invitations to ${sharedWithUserIds.size} users.")
-                            sharedWithUserIds.forEach { targetUserId ->
-                                val invitation = Invitation(
-                                    reminderId = reminderId,
-                                    creatorId = userId,
-                                    reminderTitle = newReminder.title,
-                                    reminderTimestamp = newReminder.timestamp,
-                                    reminderType = newReminder.type,
-                                    reminderCategory = newReminder.category,
-                                    sharedFromUserName = currentUserName
-                                )
-                                firestore.collection("users").document(targetUserId).collection("userInvitations")
-                                    .add(invitation)
-                                    .addOnSuccessListener { Log.d("AddReminderActivity", "Invitation sent to $targetUserId successfully!") }
-                                    .addOnFailureListener { e -> Log.e("AddReminderActivity", "Failed to send invitation to $targetUserId: ${e.message}", e) }
+            firestore.collection("users").document(userId).collection("reminders")
+                .add(reminder)
+                .addOnSuccessListener { documentReference ->
+                    val reminderId = documentReference.id
+                    firestore.collection("users").document(userId).collection("reminders")
+                        .document(reminderId)
+                        .set(reminder.copy(id = reminderId), SetOptions.merge())
+                        .addOnSuccessListener {
+                            scheduleReminderNotification(reminder.copy(id = reminderId), reminderId)
+
+                            if (sharedWithUserIds.isNotEmpty()) {
+                                sharedWithUserIds.forEach { targetUserId ->
+                                    val invitation = Invitation(
+                                        reminderId = reminderId,
+                                        creatorId = userId,
+                                        reminderTitle = reminder.title,
+                                        reminderTimestamp = reminder.timestamp,
+                                        reminderType = reminder.type,
+                                        reminderCategory = reminder.category,
+                                        sharedFromUserName = currentUserName
+                                    )
+                                    firestore.collection("users").document(targetUserId)
+                                        .collection("userInvitations")
+                                        .add(invitation)
+                                }
                             }
-                        }
 
-                        setLoadingState(false)
-                        Toast.makeText(this, "Recordatorio agregado y compartido exitosamente", Toast.LENGTH_SHORT).show()
-                        clearForm()
-                        firebaseAnalytics.logEvent("add_reminder") {
-                            param("user_id", userId)
-                            param("reminder_title", newReminder.title)
-                            param("reminder_timestamp", newReminder.timestamp.toString())
-                            param("reminder_type", newReminder.type)
-                            param("reminder_category", newReminder.category)
-                            param("shared_with_count", newReminder.sharedWith.size.toLong())
-                            param("has_location", (newReminder.latitude != null && newReminder.longitude != null).toString())
+                            setLoadingState(false)
+                            Toast.makeText(this, "Recordatorio agregado exitosamente", Toast.LENGTH_SHORT).show()
+                            clearForm()
+                            firebaseAnalytics.logEvent("add_reminder") {
+                                param("user_id", userId)
+                                param("reminder_title", reminder.title)
+                                param("reminder_timestamp", reminder.timestamp.toString())
+                                param("reminder_type", reminder.type)
+                                param("reminder_category", reminder.category)
+                                param("shared_with_count", reminder.sharedWith.size.toLong())
+                                param("has_location", (reminder.latitude != null && reminder.longitude != null).toString())
+                            }
+                            finish()
                         }
-                        finish()
-                    }
-                    .addOnFailureListener { e ->
+                        .addOnFailureListener { e ->
+                            setLoadingState(false)
+                            Toast.makeText(this, "Error al guardar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
+                }
+                .addOnFailureListener { e ->
+                    setLoadingState(false)
+                    Toast.makeText(this, "Error al agregar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+        }
+
+        // Subir imagen a imgbb si existe
+        if (selectedImageUri != null) {
+            val base64Image = uriToBase64(this, selectedImageUri!!)
+
+            val retrofit = Retrofit.Builder()
+                .baseUrl("https://api.imgbb.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            val service = retrofit.create(ImgbbService::class.java)
+            val requestBody = RequestBody.create(MultipartBody.FORM, base64Image)
+            val call = service.uploadImage("a22a878e6ccb5e3bcfd0a26cd4f5ac6c", requestBody)
+
+            call.enqueue(object : Callback<ImgbbResponse> {
+                override fun onResponse(call: Call<ImgbbResponse>, response: Response<ImgbbResponse>) {
+                    if (response.isSuccessful) {
+                        val imageUrl = response.body()?.data?.url
+                        saveReminderToFirestore(imageUrl)
+                    } else {
                         setLoadingState(false)
-                        Toast.makeText(this, "Error al actualizar ID del recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
-                        Log.e("AddReminderActivity", "Error updating reminder with ID: ${e.message}", e)
+                        Toast.makeText(this@AddReminderActivity, "Error al subir imagen", Toast.LENGTH_SHORT).show()
                     }
-            }
-            .addOnFailureListener { e ->
-                setLoadingState(false)
-                Toast.makeText(this, "Error al agregar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
-                Log.e("AddReminderActivity", "Error adding reminder: ${e.message}", e)
-            }
+                }
+
+                override fun onFailure(call: Call<ImgbbResponse>, t: Throwable) {
+                    setLoadingState(false)
+                    Toast.makeText(this@AddReminderActivity, "Fallo al subir imagen", Toast.LENGTH_SHORT).show()
+                }
+            })
+        } else {
+            saveReminderToFirestore(null)
+        }
     }
 
     private fun scheduleReminderNotification(reminder: Reminder, reminderId: String) {
@@ -432,6 +496,13 @@ class AddReminderActivity : AppCompatActivity() {
             Log.e("AddReminderActivity", "SecurityException al programar alarma: ${e.message}", e)
             Toast.makeText(this, "No se pudo programar el recordatorio. Por favor, revisa los permisos de alarma de la aplicación.", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun uriToBase64(context: Context, uri: Uri): String {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val bytes = inputStream?.readBytes()
+        return Base64.encodeToString(bytes, Base64.DEFAULT)
+
     }
 
     private fun clearForm() {

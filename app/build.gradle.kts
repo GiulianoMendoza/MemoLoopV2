@@ -41,6 +41,12 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore-ktx")
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("androidx.core:core-ktx:1.10.1")
+
+    implementation("com.google.firebase:firebase-storage")
     implementation ("org.maplibre.gl:android-sdk:11.8.5")
     implementation ("androidx.compose.material:material-icons-extended:1.6.7")
     implementation(libs.androidx.core.ktx)

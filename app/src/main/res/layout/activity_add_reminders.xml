@@ -142,27 +142,46 @@
                 android:background="@drawable/spinner_background"
                 android:layout_marginBottom="24dp" />
 
-
-
-            <Button
-                android:id="@+id/btn_select_location"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Seleccionar ubicación (opcional)" />
+                android:layout_marginBottom="12dp">
 
+                <Button
+                    android:id="@+id/btn_select_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Agregar Imagen (opcional)"
+                    android:textSize="18sp" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+
+                <Button
+                    android:id="@+id/btn_select_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:text="Seleccionar ubicación (opcional)" />
+
+            </FrameLayout>
 
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="12dp">
 
                 <Button
                     android:id="@+id/btn_add_reminder"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Agregar Recordatorio"
-                    android:textSize="16sp" />
+                    android:textSize="18sp" />
 
                 <ProgressBar
                     android:id="@+id/progress_bar"

@@ -11,6 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import android.app.Activity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -40,11 +42,14 @@ class AddReminderActivity : AppCompatActivity() {
     private lateinit var btnAddReminder: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var btnShareReminder: Button
+    private lateinit var btnSelectLocation: Button
 
     private var selectedDate: Calendar? = null
     private var selectedTime: Calendar? = null
     private var sharedWithUserIds: MutableList<String> = mutableListOf()
     private var currentUserName: String = ""
+    private var selectedLatitude: Double? = null
+    private var selectedLongitude: Double? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +88,11 @@ class AddReminderActivity : AppCompatActivity() {
         btnAddReminder = findViewById(R.id.btn_add_reminder)
         progressBar = findViewById(R.id.progress_bar)
         btnShareReminder = findViewById(R.id.btn_share_reminder)
+        btnSelectLocation = findViewById(R.id.btn_select_location)
+        btnSelectLocation.setOnClickListener {
+            val intent = Intent(this, MapPickerActivity::class.java)
+            locationPicker.launch(intent)
+        }
     }
 
     private fun setupSpinners() {
@@ -144,6 +154,35 @@ class AddReminderActivity : AppCompatActivity() {
             calendar.get(Calendar.MINUTE),
             true
         ).show()
+    }
+
+    private val locationPicker = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            if (data != null) {
+                Log.d("AddReminderActivity", "Datos recibidos del mapa: $data")
+                if (data.hasExtra("latitude") && data.hasExtra("longitude")) {
+                    selectedLatitude = data.getDoubleExtra("latitude", Double.NaN)
+                    selectedLongitude = data.getDoubleExtra("longitude", Double.NaN)
+
+                    if (!selectedLatitude!!.isNaN() && !selectedLongitude!!.isNaN()) {
+                        Toast.makeText(this, "Ubicación guardada", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Error al recibir la ubicación", Toast.LENGTH_SHORT).show()
+                        selectedLatitude = null
+                        selectedLongitude = null
+                    }
+                } else {
+                    Toast.makeText(this, "No se recibieron coordenadas", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this, "No se recibieron datos del mapa", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(this, "Operación cancelada", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun updateDateDisplay() {
@@ -287,7 +326,9 @@ class AddReminderActivity : AppCompatActivity() {
             sharedWith = sharedWithUserIds,
             isShared = sharedWithUserIds.isNotEmpty(),
             originalCreatorId = userId,
-            sharedFromUserName = currentUserName
+            sharedFromUserName = currentUserName,
+            latitude = selectedLatitude,
+            longitude = selectedLongitude
         )
 
         firestore.collection("users").document(userId).collection("reminders")
@@ -330,6 +371,7 @@ class AddReminderActivity : AppCompatActivity() {
                             param("reminder_type", newReminder.type)
                             param("reminder_category", newReminder.category)
                             param("shared_with_count", newReminder.sharedWith.size.toLong())
+                            param("has_location", (newReminder.latitude != null && newReminder.longitude != null).toString())
                         }
                         finish()
                     }
@@ -354,7 +396,6 @@ class AddReminderActivity : AppCompatActivity() {
             timeInMillis = reminder.timestamp
             add(Calendar.MINUTE, -5)
         }.timeInMillis
-
         if (notificationTime <= System.currentTimeMillis()) {
             Log.d("AddReminderActivity", "Notification time for ${reminder.title} is in the past or too soon, showing immediately.")
             notificationHelper.showNotification(
@@ -401,11 +442,14 @@ class AddReminderActivity : AppCompatActivity() {
         spinnerCategory.setSelection(0)
         spinnerFrequency.setSelection(0)
         sharedWithUserIds.clear()
+        selectedLatitude = null
+        selectedLongitude = null
     }
 
     private fun setLoadingState(isLoading: Boolean) {
         btnAddReminder.isEnabled = !isLoading
         btnShareReminder.isEnabled = !isLoading
+        btnSelectLocation.isEnabled = !isLoading
         progressBar.isVisible = isLoading
         if (isLoading) {
             btnAddReminder.text = ""

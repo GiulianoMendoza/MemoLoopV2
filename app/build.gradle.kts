@@ -41,6 +41,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation ("org.maplibre.gl:android-sdk:11.8.5")
     implementation ("androidx.compose.material:material-icons-extended:1.6.7")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

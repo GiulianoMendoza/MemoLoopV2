@@ -58,6 +58,11 @@
             android:enabled="true"
             android:exported="false">
         </receiver>
-
+        <!-- MapPickerActivity -->
+        <activity
+            android:name=".MapPickerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MemoLoop"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 </manifest>

@@ -163,6 +163,14 @@
 
             </FrameLayout>
 
+            <Button
+                android:id="@+id/btn_share_reminder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Compartir Recordatorio"
+                android:layout_marginTop="16dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

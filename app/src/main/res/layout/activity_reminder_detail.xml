@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FAFAFA"
     android:fillViewport="true">
 
@@ -12,14 +12,14 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Card Content -->
+        <!-- Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/card_reminder_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
+            app:cardElevation="6dp"
             app:cardBackgroundColor="@android:color/white">
 
             <LinearLayout
@@ -35,20 +35,22 @@
                     android:text="Título"
                     android:textSize="22sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
-                    android:layout_marginBottom="16dp" />
+                    android:textColor="#212121"
+                    android:layout_marginBottom="20dp" />
 
+                <!-- Fecha -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@drawable/ic_date_range"
-                        app:tint="#444444" />
+                        app:tint="#616161" />
 
                     <TextView
                         android:id="@+id/tv_detail_date"
@@ -56,21 +58,23 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:text="Fecha"
-                        android:textColor="#444444"
+                        android:textColor="#424242"
                         android:textSize="14sp" />
                 </LinearLayout>
 
+                <!-- Hora -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="16dp">
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="20dp">
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@drawable/ic_access_time"
-                        app:tint="#444444" />
+                        app:tint="#616161" />
 
                     <TextView
                         android:id="@+id/tv_detail_time"
@@ -78,77 +82,91 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:text="Hora"
-                        android:textColor="#444444"
+                        android:textColor="#424242"
                         android:textSize="14sp" />
                 </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                <!-- Separador visual -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="#E0E0E0" />
 
-            </LinearLayout>
-
+                <!-- Frecuencia -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Frecuencia"
                     android:textStyle="bold"
-                    android:textColor="#A6000000"
-                    android:textSize="12sp" />
+                    android:textColor="#757575"
+                    android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/tv_detail_frequency"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#000000"
+                    android:textColor="#212121"
                     android:textSize="16sp"
                     android:layout_marginBottom="16dp" />
 
+                <!-- Tipo -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tipo"
+                    android:text="Categoría"
                     android:textStyle="bold"
-                    android:textColor="#A6000000"
-                    android:textSize="12sp" />
+                    android:textColor="#757575"
+                    android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/tv_detail_type"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
-                    android:textColor="#000000"
+                    android:textColor="#212121"
                     android:textSize="16sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Buttons -->
+        <!-- Botones -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
-            android:orientation="horizontal">
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="32dp"
+            android:layout_marginHorizontal="24dp"
+            android:weightSum="2"
+            android:divider="?android:attr/dividerHorizontal"
+            android:showDividers="middle"
+            android:dividerPadding="8dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:backgroundTint="#FFFFFF"
+                android:strokeColor="#2196F3"
                 android:text="Editar"
+                android:textColor="#2196F3"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white"
-                android:backgroundTint="#2196F3"
-                android:layout_marginEnd="8dp" />
+                app:cornerRadius="12dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_delete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
                 android:text="Eliminar"
-                android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:backgroundTint="#F44336" />
+                android:backgroundTint="#F44336"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp" />
         </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

@@ -110,18 +110,25 @@ class ReminderDetailActivity : AppCompatActivity() {
         tvFrequency.text = reminder.type
         tvType.text = reminder.category
         cardView.setCardBackgroundColor(getColorByType(this, reminder.category))
-
-
-
-
     }
 
     private fun setupListeners() {
         btnEdit.setOnClickListener {
-            val intent = Intent(this, AddReminderActivity::class.java).apply {
-                putExtra("EDIT_REMINDER_ID", reminderId)
+            reminderData?.let { reminder ->
+                val intent = Intent(this, AddReminderActivity::class.java).apply {
+                    putExtra("EDIT_MODE", true)
+                    putExtra("REMINDER_ID", reminderId)
+                    putExtra("TITLE", reminder.title)
+                    putExtra("TIMESTAMP", reminder.timestamp)
+                    putExtra("TYPE", reminder.type)
+                    putExtra("CATEGORY", reminder.category)
+                    putExtra("LATITUDE", reminder.latitude)
+                    putExtra("LONGITUDE", reminder.longitude)
+                    putExtra("IMAGE_URL", reminder.imageUrl)
+                    putStringArrayListExtra("SHARED_WITH", ArrayList(reminder.sharedWith))
+                }
+                startActivity(intent)
             }
-            startActivity(intent)
         }
 
         btnDelete.setOnClickListener {

@@ -87,6 +87,87 @@ class AddReminderActivity : AppCompatActivity() {
         setupSpinners()
         setupClickListeners()
         loadCurrentUserName()
+
+        val isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
+        setupSaveButton(isEditMode)
+        if (isEditMode) {
+            supportActionBar?.title = "Editar Recordatorio"
+            loadReminderData()
+        } else {
+            supportActionBar?.title = "Agregar Recordatorio"
+        }
+    }
+
+    private fun setupSaveButton(isEditMode: Boolean) {
+        val saveButton = findViewById<Button>(R.id.btn_add_reminder)
+        saveButton.text = if (isEditMode) "Confirmar Edición" else "Agregar Recordatorio"
+        saveButton.setOnClickListener { addReminder() }
+    }
+
+    private fun setupSpinnersWithSelection(selectedCategory: String?, selectedType: String?) {
+        // Configurar spinner de categoría
+        val categories = resources.getStringArray(R.array.reminder_categories)
+        val categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCategory.adapter = categoryAdapter
+
+        // Configurar spinner de tipo/frecuencia
+        val types = resources.getStringArray(R.array.reminder_frequencies)
+        val typeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
+        typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerType.adapter = typeAdapter
+
+        // Establecer selección en el spinner de categoría si existe
+        selectedCategory?.let {
+            val categoryPosition = categories.indexOf(it)
+            if (categoryPosition >= 0) {
+                spinnerCategory.setSelection(categoryPosition)
+            } else {
+                Log.w("AddReminder", "Categoría no encontrada en el array: $it")
+            }
+        }
+
+        // Establecer selección en el spinner de tipo si existe
+        selectedType?.let {
+            val typePosition = types.indexOf(it)
+            if (typePosition >= 0) {
+                spinnerType.setSelection(typePosition)
+            } else {
+                Log.w("AddReminder", "Tipo no encontrado en el array: $it")
+            }
+        }
+    }
+
+    private fun loadReminderData() {
+        etReminderTitle.setText(intent.getStringExtra("TITLE"))
+
+        val timestamp = intent.getLongExtra("TIMESTAMP", 0)
+        if (timestamp > 0) {
+            val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+            selectedDate = calendar
+            selectedTime = calendar
+            updateDateDisplay()
+            updateTimeDisplay()
+        }
+
+        // Establecer categoría y tipo
+        val category = intent.getStringExtra("CATEGORY")
+        val type = intent.getStringExtra("TYPE")
+
+        setupSpinnersWithSelection(category, type)
+
+
+        selectedLatitude = intent.getDoubleExtra("LATITUDE", Double.NaN).takeIf { !it.isNaN() }
+        selectedLongitude = intent.getDoubleExtra("LONGITUDE", Double.NaN).takeIf { !it.isNaN() }
+
+        // Usuarios compartidos
+        sharedWithUserIds = intent.getStringArrayListExtra("SHARED_WITH")?.toMutableList() ?: mutableListOf()
+
+        // Imagen (necesitarías cargar la imagen desde la URL si existe)
+        val imageUrl = intent.getStringExtra("IMAGE_URL")
+        if (!imageUrl.isNullOrEmpty()) {
+            // Implementa la carga de la imagen aquí
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -324,6 +405,8 @@ class AddReminderActivity : AppCompatActivity() {
         val selectedCategory = spinnerCategory.selectedItem.toString()
         val selectedType = spinnerType.selectedItem.toString()
         val userId = auth.currentUser?.uid
+        val isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
+        val reminderId = if (isEditMode) intent.getStringExtra("REMINDER_ID") else null
 
         if (title.isEmpty() || selectedDate == null || selectedTime == null) {
             Toast.makeText(this, "Por favor, complete todos los campos de recordatorio", Toast.LENGTH_SHORT).show()
@@ -364,62 +447,93 @@ class AddReminderActivity : AppCompatActivity() {
                 sharedFromUserName = currentUserName,
                 latitude = selectedLatitude,
                 longitude = selectedLongitude,
-                imageUrl = imageUrl
+                imageUrl = imageUrl ?: intent.getStringExtra("IMAGE_URL") // Mantener la imagen existente si no se sube una nueva
             )
 
-            firestore.collection("users").document(userId).collection("reminders")
-                .add(reminder)
-                .addOnSuccessListener { documentReference ->
-                    val reminderId = documentReference.id
-                    firestore.collection("users").document(userId).collection("reminders")
-                        .document(reminderId)
-                        .set(reminder.copy(id = reminderId), SetOptions.merge())
-                        .addOnSuccessListener {
-                            scheduleReminderNotification(reminder.copy(id = reminderId), reminderId)
+            if (isEditMode && reminderId != null) {
+                // Modo edición - actualizar el recordatorio existente
+                firestore.collection("users").document(userId).collection("reminders")
+                    .document(reminderId)
+                    .set(reminder.copy(id = reminderId))
+                    .addOnSuccessListener {
+                        // Cancelar notificación antigua y programar nueva
+                        cancelExistingNotification(reminderId)
+                        scheduleReminderNotification(reminder.copy(id = reminderId), reminderId)
 
-                            if (sharedWithUserIds.isNotEmpty()) {
-                                sharedWithUserIds.forEach { targetUserId ->
-                                    val invitation = Invitation(
-                                        reminderId = reminderId,
-                                        creatorId = userId,
-                                        reminderTitle = reminder.title,
-                                        reminderTimestamp = reminder.timestamp,
-                                        reminderType = reminder.type,
-                                        reminderCategory = reminder.category,
-                                        sharedFromUserName = currentUserName
-                                    )
-                                    firestore.collection("users").document(targetUserId)
-                                        .collection("userInvitations")
-                                        .add(invitation)
+                        // Actualizar invitaciones si es un recordatorio compartido
+                        if (sharedWithUserIds.isNotEmpty()) {
+                            updateSharedReminders(reminderId, reminder)
+                        }
+
+                        setLoadingState(false)
+                        Toast.makeText(this, "Recordatorio actualizado exitosamente", Toast.LENGTH_SHORT).show()
+                        firebaseAnalytics.logEvent("edit_reminder") {
+                            param("user_id", userId)
+                            param("reminder_id", reminderId)
+                            param("reminder_title", reminder.title)
+                        }
+                        finish()
+                    }
+                    .addOnFailureListener { e ->
+                        setLoadingState(false)
+                        Toast.makeText(this, "Error al actualizar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+            } else {
+                // Modo creación - agregar nuevo recordatorio
+                firestore.collection("users").document(userId).collection("reminders")
+                    .add(reminder)
+                    .addOnSuccessListener { documentReference ->
+                        val newReminderId = documentReference.id
+                        firestore.collection("users").document(userId).collection("reminders")
+                            .document(newReminderId)
+                            .set(reminder.copy(id = newReminderId), SetOptions.merge())
+                            .addOnSuccessListener {
+                                scheduleReminderNotification(reminder.copy(id = newReminderId), newReminderId)
+
+                                if (sharedWithUserIds.isNotEmpty()) {
+                                    sharedWithUserIds.forEach { targetUserId ->
+                                        val invitation = Invitation(
+                                            reminderId = newReminderId,
+                                            creatorId = userId,
+                                            reminderTitle = reminder.title,
+                                            reminderTimestamp = reminder.timestamp,
+                                            reminderType = reminder.type,
+                                            reminderCategory = reminder.category,
+                                            sharedFromUserName = currentUserName
+                                        )
+                                        firestore.collection("users").document(targetUserId)
+                                            .collection("userInvitations")
+                                            .add(invitation)
+                                    }
                                 }
-                            }
 
-                            setLoadingState(false)
-                            Toast.makeText(this, "Recordatorio agregado exitosamente", Toast.LENGTH_SHORT).show()
-                            clearForm()
-                            firebaseAnalytics.logEvent("add_reminder") {
-                                param("user_id", userId)
-                                param("reminder_title", reminder.title)
-                                param("reminder_timestamp", reminder.timestamp.toString())
-                                param("reminder_type", reminder.type)
-                                param("reminder_category", reminder.category)
-                                param("shared_with_count", reminder.sharedWith.size.toLong())
-                                param("has_location", (reminder.latitude != null && reminder.longitude != null).toString())
+                                setLoadingState(false)
+                                Toast.makeText(this, "Recordatorio agregado exitosamente", Toast.LENGTH_SHORT).show()
+                                clearForm()
+                                firebaseAnalytics.logEvent("add_reminder") {
+                                    param("user_id", userId)
+                                    param("reminder_title", reminder.title)
+                                    param("reminder_timestamp", reminder.timestamp.toString())
+                                    param("reminder_type", reminder.type)
+                                    param("reminder_category", reminder.category)
+                                    param("shared_with_count", reminder.sharedWith.size.toLong())
+                                    param("has_location", (reminder.latitude != null && reminder.longitude != null).toString())
+                                }
+                                finish()
                             }
-                            finish()
-                        }
-                        .addOnFailureListener { e ->
-                            setLoadingState(false)
-                            Toast.makeText(this, "Error al guardar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
-                        }
-                }
-                .addOnFailureListener { e ->
-                    setLoadingState(false)
-                    Toast.makeText(this, "Error al agregar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
-                }
+                            .addOnFailureListener { e ->
+                                setLoadingState(false)
+                                Toast.makeText(this, "Error al guardar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
+                    }
+                    .addOnFailureListener { e ->
+                        setLoadingState(false)
+                        Toast.makeText(this, "Error al agregar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+            }
         }
 
-        // Subir imagen a imgbb si existe
+        // Subir imagen a imgbb si existe una nueva imagen seleccionada
         if (selectedImageUri != null) {
             val base64Image = uriToBase64(this, selectedImageUri!!)
 
@@ -449,8 +563,33 @@ class AddReminderActivity : AppCompatActivity() {
                 }
             })
         } else {
+            // No hay nueva imagen, guardar con la imagen existente (en modo edición) o sin imagen
             saveReminderToFirestore(null)
         }
+    }
+
+    private fun updateSharedReminders(reminderId: String, updatedReminder: Reminder) {
+        sharedWithUserIds.forEach { userId ->
+            firestore.collection("users").document(userId).collection("reminders")
+                .document(reminderId)
+                .set(updatedReminder)
+                .addOnFailureListener { e ->
+                    Log.e("AddReminderActivity", "Error al actualizar recordatorio compartido para usuario $userId: ${e.message}")
+                }
+        }
+    }
+
+    private fun cancelExistingNotification(reminderId: String) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val notificationId = reminderId.hashCode()
+        val intent = Intent(this, NotificationPublisher::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
     }
 
     private fun scheduleReminderNotification(reminder: Reminder, reminderId: String) {

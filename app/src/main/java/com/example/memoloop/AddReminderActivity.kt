@@ -14,6 +14,7 @@ import android.widget.*
 import android.app.Activity
 import android.net.Uri
 import android.content.Context
+import androidx.core.content.FileProvider
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
@@ -36,6 +37,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -66,6 +68,7 @@ class AddReminderActivity : AppCompatActivity() {
     private var selectedLatitude: Double? = null
     private var selectedLongitude: Double? = null
     private var selectedImageUri: Uri? = null
+    private var capturedImageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -220,7 +223,8 @@ class AddReminderActivity : AppCompatActivity() {
                 }
         }
         btnSelectImage.setOnClickListener {
-            imagePickerLauncher.launch("image/*")
+            //imagePickerLauncher.launch("image/*")
+            showImageSourceDialog()
         }
 
     }
@@ -641,7 +645,46 @@ class AddReminderActivity : AppCompatActivity() {
         val inputStream = context.contentResolver.openInputStream(uri)
         val bytes = inputStream?.readBytes()
         return Base64.encodeToString(bytes, Base64.DEFAULT)
+    }
 
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && capturedImageUri != null) {
+            selectedImageUri = capturedImageUri
+        }
+    }
+
+    private fun openCamera() {
+        val imageFile = File.createTempFile("camera_photo", ".jpg", cacheDir).apply {
+            createNewFile()
+            deleteOnExit()
+        }
+
+        capturedImageUri = FileProvider.getUriForFile(
+            this,
+            "${packageName}.fileprovider",
+            imageFile
+        )
+
+        capturedImageUri?.let {
+            cameraLauncher.launch(it)
+        }
+    }
+
+    private fun showImageSourceDialog() {
+        val options = arrayOf("Sacar foto", "Elegir desde la galería")
+
+        AlertDialog.Builder(this)
+            .setTitle("Seleccionar imagen")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> openCamera()
+                    1 -> imagePickerLauncher.launch("image/*")
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     private fun clearForm() {

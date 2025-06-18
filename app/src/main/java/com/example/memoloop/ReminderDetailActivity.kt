@@ -1,9 +1,13 @@
 package com.example.memoloop
 
 import android.app.AlertDialog
+import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -12,6 +16,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
+
+import com.bumptech.glide.Glide
+import com.github.chrisbanes.photoview.PhotoView
+import org.maplibre.android.MapLibre
+import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.annotations.MarkerOptions
+import org.maplibre.android.maps.UiSettings
 
 class ReminderDetailActivity : AppCompatActivity() {
 
@@ -24,6 +38,11 @@ class ReminderDetailActivity : AppCompatActivity() {
     private lateinit var tvFrequency: TextView
     private lateinit var tvType: TextView
     private lateinit var cardView: CardView
+    private lateinit var cardImgReminder: CardView
+    private lateinit var cardMapReminder: CardView
+    private lateinit var imgReminder: PhotoView
+    private lateinit var btnDownloadImage: ImageButton
+    private lateinit var mapView: MapView
 
     private lateinit var btnEdit: Button
     private lateinit var btnDelete: Button
@@ -33,6 +52,7 @@ class ReminderDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MapLibre.getInstance(this)
         setContentView(R.layout.activity_reminder_detail)
 
         auth = FirebaseAuth.getInstance()
@@ -52,6 +72,13 @@ class ReminderDetailActivity : AppCompatActivity() {
         btnEdit = findViewById(R.id.btn_edit)
         btnDelete = findViewById(R.id.btn_delete)
         cardView = findViewById(R.id.card_reminder_detail)
+        imgReminder = findViewById(R.id.img_reminder)
+        mapView = findViewById(R.id.mapView)
+        cardImgReminder = findViewById(R.id.card_img_reminder)
+        cardMapReminder = findViewById(R.id.card_map_reminder)
+        btnDownloadImage = findViewById(R.id.btn_download_image)
+
+        mapView.onCreate(null)
     }
     private fun getColorByType(context: Context, type: String): Int {
         val typeLower = type.lowercase()
@@ -109,6 +136,54 @@ class ReminderDetailActivity : AppCompatActivity() {
         tvTime.text = timeFormat.format(date)
         tvFrequency.text = reminder.type
         tvType.text = reminder.category
+
+        val url = reminder.imageUrl?.trim()
+        if (!url.isNullOrEmpty()) {
+            cardImgReminder.visibility = View.VISIBLE
+            Glide.with(this)
+                .load(url)
+                .into(imgReminder)
+            btnDownloadImage.visibility = View.VISIBLE
+            btnDownloadImage.setOnClickListener {
+                downloadImage(this, url)
+            }
+        } else {
+            cardImgReminder.visibility = View.GONE
+        }
+
+        if (reminder.latitude != null && reminder.longitude != null) {
+            cardMapReminder.visibility = View.VISIBLE
+
+            val styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+
+            mapView.getMapAsync { mapLibreMap ->
+                mapLibreMap.setStyle(styleUrl) {
+
+                    val location = LatLng(reminder.latitude!!, reminder.longitude!!)
+
+                    mapLibreMap.setCameraPosition(
+                        CameraPosition.Builder()
+                            .target(location)
+                            .zoom(14.0)
+                            .build()
+                    )
+
+                    mapLibreMap.uiSettings.apply {
+                        isScrollGesturesEnabled = true
+                        isZoomGesturesEnabled = true
+                        isRotateGesturesEnabled = false
+                        isTiltGesturesEnabled = false
+                    }
+
+                    mapLibreMap.addMarker(
+                        MarkerOptions()
+                            .position(location)
+                            .title("Ubicación guardada")
+                    )
+                }
+            }
+        }
+
         cardView.setCardBackgroundColor(getColorByType(this, reminder.category))
     }
 
@@ -157,5 +232,46 @@ class ReminderDetailActivity : AppCompatActivity() {
             .addOnFailureListener {
                 Toast.makeText(this, "Error al eliminar el recordatorio", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    //Auxiliares
+    private fun downloadImage(context: Context, imageUrl: String) {
+        val request = DownloadManager.Request(Uri.parse(imageUrl))
+            .setTitle("imagen_recordatorio.jpg")
+            .setDescription("Descargando imagen del recordatorio...")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "imagen_recordatorio.jpg")
+            .setAllowedOverMetered(true)
+            .setAllowedOverRoaming(true)
+
+        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager.enqueue(request)
+
+        Toast.makeText(context, "Descarga iniciada", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mapView.onStart()
+    }
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+    override fun onPause() {
+        mapView.onPause()
+        super.onPause()
+    }
+    override fun onStop() {
+        mapView.onStop()
+        super.onStop()
+    }
+    override fun onDestroy() {
+        mapView.onDestroy()
+        super.onDestroy()
+    }
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
     }
 }

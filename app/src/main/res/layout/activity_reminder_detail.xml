@@ -128,6 +128,64 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+
+        <!-- Image -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_img_reminder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+
+                <com.github.chrisbanes.photoview.PhotoView
+                    android:id="@+id/img_reminder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Imagen del recordatorio" />
+
+                <ImageButton
+                    android:id="@+id/btn_download_image"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="end|bottom"
+                    android:layout_margin="12dp"
+                    android:background="@drawable/bg_circle_white"
+                    android:src="@drawable/download"
+                    android:contentDescription="Descargar imagen"
+                    android:padding="8dp"
+                    android:visibility="gone"
+                    app:tint="#212121" />
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Map -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_map_reminder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <org.maplibre.android.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp" />
+        </androidx.cardview.widget.CardView>
+
+
+
         <!-- Botones -->
         <LinearLayout
             android:layout_width="match_parent"

@@ -2,6 +2,7 @@ plugins {
     id("com.google.gms.google-services")
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
 }
 
 android {
@@ -41,11 +42,12 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore-ktx")
-
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("androidx.core:core-ktx:1.10.1")
-
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation ("com.github.chrisbanes:PhotoView:2.3.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
     implementation("com.google.firebase:firebase-storage")
     implementation ("org.maplibre.gl:android-sdk:11.8.5")
     implementation ("androidx.compose.material:material-icons-extended:1.6.7")

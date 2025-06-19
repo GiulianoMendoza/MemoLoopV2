@@ -21,7 +21,7 @@ import com.google.firebase.firestore.SetOptions
 import java.text.SimpleDateFormat
 import java.util.*
 
-class InvitationsActivity : AppCompatActivity(), InvitationAdapter.OnInvitationActionListener {
+class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationActionListener {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     private lateinit var auth: FirebaseAuth

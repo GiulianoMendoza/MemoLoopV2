@@ -41,7 +41,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AddReminderActivity : AppCompatActivity() {
+class AddReminderActivity : BaseActivity() {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     private lateinit var auth: FirebaseAuth

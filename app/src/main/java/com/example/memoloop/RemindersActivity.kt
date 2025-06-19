@@ -36,7 +36,7 @@ import com.google.firebase.firestore.Query
 import java.text.SimpleDateFormat
 import java.util.*
 
-class RemindersActivity : AppCompatActivity(), RemindersAdapter.OnReminderOptionsClickListener {
+class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClickListener {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     private lateinit var auth: FirebaseAuth
@@ -66,7 +66,8 @@ class RemindersActivity : AppCompatActivity(), RemindersAdapter.OnReminderOption
         setContentView(R.layout.activity_reminders_list)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar_main)
-        setSupportActionBar(toolbar)
+        //setSupportActionBar(toolbar)
+        //setContentView(R.layout.activity_welcome)
         supportActionBar?.title = "Mis Recordatorios"
 
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)

@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_profile"
+        android:title="Perfil"
+        android:icon="@drawable/ic_add"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_reminders"
+        android:title="Recordatorios"
+        android:icon="@drawable/ic_category_salud"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_logout"
+        android:title="Cerrar sesión"
+        android:icon="@drawable/ic_date_range"
+        app:showAsAction="ifRoom" />
+</menu>

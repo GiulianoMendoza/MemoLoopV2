@@ -27,7 +27,7 @@ import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.maps.UiSettings
 
-class ReminderDetailActivity : AppCompatActivity() {
+class ReminderDetailActivity : BaseActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore

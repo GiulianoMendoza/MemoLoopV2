@@ -63,15 +63,6 @@
                 android:textSize="18sp"
                 android:textColor="?android:attr/textColorSecondary" />
 
-            <!-- Nota: El botón btn_view_invitations_welcome no estaba en el XML que proporcionaste,
-                 pero la cadena de texto para él ya está en strings.xml por si lo añades. -->
-            <!-- <Button
-                android:id="@+id/btn_view_invitations_welcome"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/view_invitations_button"
-                android:visibility="gone" /> -->
 
             <ProgressBar
                 android:id="@+id/progress_bar_welcome_dynamic"

@@ -14,7 +14,6 @@
     <string name="add_reminder_button">Agregar Recordatorio</string>
     <string name="share_reminder_button">Compartir Recordatorio</string>
 
-    <!-- Cadenas de texto individuales -->
     <string name="menu_logout">Cerrar Sesión</string>
     <string name="my_reminders_toolbar_title">Mis Recordatorios</string>
     <string name="no_reminders_message">No hay recordatorios. ¡Haz clic en el + para agregar uno!</string>
@@ -76,21 +75,18 @@
     <string name="invitations_toolbar_title">Mis Invitaciones</string>
     <string name="pending_invitations_section_title">Invitaciones Pendientes</string>
 
-    <!-- Cadenas para LoginActivity -->
     <string name="login_title">Iniciar Sesión</string>
     <string name="email_hint">Correo Electrónico</string>
     <string name="password_hint">Contraseña</string>
     <string name="login_button_text">Iniciar Sesión</string>
     <string name="no_account_register_text">¿No tienes una cuenta? Regístrate aquí</string>
 
-    <!-- Cadenas para RegisterActivity -->
     <string name="register_title">Crear Cuenta</string>
     <string name="full_name_hint">Nombre Completo</string>
     <string name="phone_hint">Teléfono</string>
     <string name="register_button_text">Registrarse</string>
     <string name="already_have_account_login_text">¿Ya tienes una cuenta? Inicia sesión aquí.</string>
 
-    <!-- Nuevas cadenas para ReminderDetailActivity -->
     <string name="detail_title_placeholder">Título</string>
     <string name="date_icon_description">Icono de fecha</string>
     <string name="detail_date_placeholder">Fecha</string>
@@ -103,48 +99,39 @@
     <string name="edit_button_text">Editar</string>
     <string name="delete_button_text">Eliminar</string>
 
-    <!-- Nuevas cadenas para RemindersActivity -->
     <string name="add_reminder_section_title">Agregar Recordatorio</string>
     <string name="upcoming_reminders_section_title">Próximos Recordatorios</string>
     <string name="no_reminders_add_one_message_reminders_activity">No hay recordatorios. ¡Agrega uno!</string>
     <string name="filter_reminders_title">Filtrar Recordatorios</string>
     <string name="apply_filter_button">Aplicar Filtro</string>
 
-    <!-- Nuevas cadenas para MainActivity (splash screen) -->
     <string name="welcome_splash_title">¡Bienvenido a RecodatoryApp!</string>
     <string name="loading_reminders_message">Cargando tus recordatorios...</string>
 
-    <!-- Nuevas cadenas para dialog_edit_reminder.xml -->
     <string name="reminder_title_label">Título del Recordatorio</string>
     <string name="reminder_title_hint_short">Título</string>
 
-    <!-- Nuevas cadenas para dialog_share_reminder.xml -->
     <string name="share_dialog_title">Compartir Recordatorio</string>
     <string name="share_dialog_instruction">Ingresa los correos electrónicos de los usuarios con quienes deseas compartir, separados por comas.</string>
     <string name="share_emails_hint">correos@ejemplo.com, otro@ejemplo.com</string>
     <string name="share_button_text">Compartir</string>
 
-    <!-- Nuevas cadenas para item_invitation.xml -->
     <string name="invitation_title_placeholder">Invitación: %s</string>
     <string name="invitation_sender_placeholder">De: %s</string>
     <string name="reject_button_text">Rechazar</string>
     <string name="accept_button_text">Aceptar</string>
 
-    <!-- Nuevas cadenas para item_reminder.xml -->
     <string name="reminder_title_placeholder_long">Título del Recordatorio Largo y que se corta</string>
     <string name="reminder_type_icon_description">Icono de tipo de recordatorio</string>
     <string name="reminder_category_icon_description">Icono de categoría de recordatorio</string>
     <string name="reminder_options_description">Opciones del recordatorio</string>
     <string name="shared_with_users_placeholder">Compartido con: %s</string>
 
-    <!-- Nueva cadena para MapPickerActivity -->
     <string name="confirm_location_button">Confirmar ubicación</string>
 
-    <!-- Nuevas cadenas para el toolbar inferior -->
     <string name="history_description">Historial</string>
     <string name="language_switcher_description">Cambiar Idioma</string>
 
-    <!-- Arrays de cadenas -->
     <string-array name="reminder_categories">
         <item>Salud</item>
         <item>Deporte</item>

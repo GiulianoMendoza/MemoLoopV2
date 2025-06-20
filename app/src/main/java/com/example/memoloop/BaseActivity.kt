@@ -13,14 +13,13 @@ import com.google.firebase.auth.FirebaseAuth
 
 open class BaseActivity : AppCompatActivity() {
 
-    // Se llama antes de onCreate, perfecto para configurar el locale
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(LanguageManager.updateBaseContextLocale(newBase!!))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        super.setContentView(R.layout.activity_base) // Asegúrate de que este es el layout de tu base
+        super.setContentView(R.layout.activity_base)
 
         setupBottomToolbar()
     }
@@ -45,14 +44,13 @@ open class BaseActivity : AppCompatActivity() {
             startActivity(Intent(this, RemindersActivity::class.java))
         }
 
-        // Listener para el botón de cambio de idioma
         findViewById<ImageButton>(R.id.btn_language_switcher)?.setOnClickListener {
             val currentLanguage = LanguageManager.getSavedLanguage(this)
-            val newLanguage = if (currentLanguage == "es") "en" else "es" // Alterna entre es y en
+            val newLanguage = if (currentLanguage == "es") "en" else "es"
 
-            LanguageManager.saveLanguage(this, newLanguage) // Guarda la preferencia
-            LanguageManager.setLocale(this, newLanguage)    // Aplica el nuevo idioma al contexto
-            LanguageManager.restartActivity(this)           // Reinicia la actividad para que los cambios se reflejen
+            LanguageManager.saveLanguage(this, newLanguage)
+            LanguageManager.setLocale(this, newLanguage)
+            LanguageManager.restartActivity(this)
             Toast.makeText(this, "Idioma cambiado a ${newLanguage.uppercase()}", Toast.LENGTH_SHORT).show()
         }
 

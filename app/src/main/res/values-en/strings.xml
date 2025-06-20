@@ -15,7 +15,6 @@
     <string name="add_reminder_button">Add Reminder</string>
     <string name="share_reminder_button">Share Reminder</string>
 
-    <!-- Individual text strings -->
     <string name="menu_logout">Log Out</string>
     <string name="my_reminders_toolbar_title">My Reminders</string>
     <string name="no_reminders_message">No reminders. Click on the + to add one!</string>
@@ -77,21 +76,18 @@
     <string name="invitations_toolbar_title">My Invitations</string>
     <string name="pending_invitations_section_title">Pending Invitations</string>
 
-    <!-- Strings for LoginActivity -->
     <string name="login_title">Login</string>
     <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
     <string name="login_button_text">Login</string>
     <string name="no_account_register_text">Don\'t have an account? Sign up here</string>
 
-    <!-- Strings for RegisterActivity -->
     <string name="register_title">Create Account</string>
     <string name="full_name_hint">Full Name</string>
     <string name="phone_hint">Phone</string>
     <string name="register_button_text">Register</string>
     <string name="already_have_account_login_text">Already have an account? Log in here.</string>
 
-    <!-- New strings for ReminderDetailActivity -->
     <string name="detail_title_placeholder">Title</string>
     <string name="date_icon_description">Date icon</string>
     <string name="detail_date_placeholder">Date</string>
@@ -104,48 +100,39 @@
     <string name="edit_button_text">Edit</string>
     <string name="delete_button_text">Delete</string>
 
-    <!-- New strings for RemindersActivity -->
     <string name="add_reminder_section_title">Add Reminder</string>
     <string name="upcoming_reminders_section_title">Upcoming Reminders</string>
     <string name="no_reminders_add_one_message_reminders_activity">No reminders. Add one!</string>
     <string name="filter_reminders_title">Filter Reminders</string>
     <string name="apply_filter_button">Apply Filter</string>
 
-    <!-- New strings for MainActivity (splash screen) -->
     <string name="welcome_splash_title">Welcome to RecodatoryApp!</string>
     <string name="loading_reminders_message">Loading your reminders...</string>
 
-    <!-- New strings for dialog_edit_reminder.xml -->
     <string name="reminder_title_label">Reminder Title</string>
     <string name="reminder_title_hint_short">Title</string>
 
-    <!-- New strings for dialog_share_reminder.xml -->
     <string name="share_dialog_title">Share Reminder</string>
     <string name="share_dialog_instruction">Enter the email addresses of the users you want to share with, separated by commas.</string>
     <string name="share_emails_hint">emails@example.com, other@example.com</string>
     <string name="share_button_text">Share</string>
 
-    <!-- New strings for item_invitation.xml -->
     <string name="invitation_title_placeholder">Invitation: %s</string>
     <string name="invitation_sender_placeholder">From: %s</string>
     <string name="reject_button_text">Reject</string>
     <string name="accept_button_text">Accept</string>
 
-    <!-- New strings for item_reminder.xml -->
     <string name="reminder_title_placeholder_long">Long Reminder Title that gets cut off</string>
     <string name="reminder_type_icon_description">Reminder type icon</string>
     <string name="reminder_category_icon_description">Reminder category icon</string>
     <string name="reminder_options_description">Reminder options</string>
     <string name="shared_with_users_placeholder">Shared with: %s</string>
 
-    <!-- New string for MapPickerActivity -->
     <string name="confirm_location_button">Confirm Location</string>
 
-    <!-- Nuevas cadenas para el toolbar inferior -->
     <string name="history_description">History</string>
     <string name="language_switcher_description">Change Language</string>
 
-    <!-- Arrays de cadenas -->
     <string-array name="reminder_categories">
         <item>Health</item>
         <item>Sports</item>

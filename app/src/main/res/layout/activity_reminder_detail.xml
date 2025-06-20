@@ -32,11 +32,11 @@
                     android:id="@+id/tv_detail_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Título"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121"
-                    android:layout_marginBottom="20dp" />
+                android:text="@string/detail_title_placeholder"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_marginBottom="20dp" />
 
                 <!-- Fecha -->
                 <LinearLayout
@@ -50,14 +50,15 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@drawable/ic_date_range"
-                        app:tint="#616161" />
+                        app:tint="#616161"
+                        android:contentDescription="@string/date_icon_description" />
 
                     <TextView
                         android:id="@+id/tv_detail_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="Fecha"
+                        android:text="@string/detail_date_placeholder"
                         android:textColor="#424242"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -74,14 +75,15 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@drawable/ic_access_time"
-                        app:tint="#616161" />
+                        app:tint="#616161"
+                        android:contentDescription="@string/time_icon_description" />
 
                     <TextView
                         android:id="@+id/tv_detail_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="Hora"
+                        android:text="@string/detail_time_placeholder"
                         android:textColor="#424242"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -97,7 +99,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Frecuencia"
+                    android:text="@string/detail_frequency_label"
                     android:textStyle="bold"
                     android:textColor="#757575"
                     android:textSize="13sp" />
@@ -114,7 +116,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Categoría"
+                    android:text="@string/detail_category_label"
                     android:textStyle="bold"
                     android:textColor="#757575"
                     android:textSize="13sp" />
@@ -128,8 +130,6 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-
-        <!-- Image -->
         <androidx.cardview.widget.CardView
             android:id="@+id/card_img_reminder"
             android:layout_width="match_parent"
@@ -150,7 +150,7 @@
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
-                    android:contentDescription="Imagen del recordatorio" />
+                    android:contentDescription="@string/reminder_image_description" />
 
                 <ImageButton
                     android:id="@+id/btn_download_image"
@@ -160,14 +160,13 @@
                     android:layout_margin="12dp"
                     android:background="@drawable/bg_circle_white"
                     android:src="@drawable/download"
-                    android:contentDescription="Descargar imagen"
+                    android:contentDescription="@string/download_image_button_description"
                     android:padding="8dp"
                     android:visibility="gone"
                     app:tint="#212121" />
             </FrameLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Map -->
         <androidx.cardview.widget.CardView
             android:id="@+id/card_map_reminder"
             android:layout_width="match_parent"
@@ -183,8 +182,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp" />
         </androidx.cardview.widget.CardView>
-
-
 
         <!-- Botones -->
         <LinearLayout
@@ -208,7 +205,7 @@
                 android:layout_weight="1"
                 android:backgroundTint="#FFFFFF"
                 android:strokeColor="#2196F3"
-                android:text="Editar"
+                android:text="@string/edit_button_text"
                 android:textColor="#2196F3"
                 android:textAllCaps="false"
                 app:cornerRadius="12dp" />
@@ -219,7 +216,7 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="Eliminar"
+                android:text="@string/delete_button_text"
                 android:textColor="@android:color/white"
                 android:backgroundTint="#F44336"
                 android:textAllCaps="false"

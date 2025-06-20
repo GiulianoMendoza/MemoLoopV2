@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="¡Bienvenido a RecodatoryApp!"
+        android:text="@string/welcome_splash_title"
         android:textSize="28sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"
@@ -19,7 +19,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cargando tus recordatorios..."
+        android:text="@string/loading_reminders_message"
         android:textSize="18sp"
         android:layout_marginBottom="32dp"
         android:gravity="center"

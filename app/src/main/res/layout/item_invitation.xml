@@ -18,7 +18,7 @@
             android:id="@+id/tv_invitation_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Invitación: [Título del Recordatorio]"
+            android:text="@string/invitation_title_placeholder"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="?android:attr/textColorPrimary"
@@ -28,7 +28,7 @@
             android:id="@+id/tv_invitation_sender"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="De: [Nombre del Usuario]"
+            android:text="@string/invitation_sender_placeholder"
             android:textSize="14sp"
             android:textColor="?android:attr/textColorSecondary"
             android:layout_marginBottom="8dp" />
@@ -43,7 +43,7 @@
                 android:id="@+id/btn_reject_invitation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rechazar"
+                android:text="@string/reject_button_text"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:textColor="@color/design_default_color_error" />
 
@@ -51,7 +51,7 @@
                 android:id="@+id/btn_accept_invitation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Aceptar"
+                android:text="@string/accept_button_text"
                 android:layout_marginStart="8dp"
                 style="@style/Widget.MaterialComponents.Button" />
         </LinearLayout>

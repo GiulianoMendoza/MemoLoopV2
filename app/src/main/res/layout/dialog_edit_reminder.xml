@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Título del Recordatorio"
+        android:text="@string/reminder_title_label"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_marginBottom="8dp" />
@@ -24,7 +24,7 @@
             android:id="@+id/et_edit_reminder_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Título"
+            android:hint="@string/reminder_title_hint_short"
             android:inputType="text" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -41,14 +41,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Fecha: Seleccionar"
+            android:text="@string/selected_date_placeholder"
             android:textSize="16sp" />
 
         <Button
             android:id="@+id/btn_edit_select_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📅"
+            android:text="@string/date_picker_icon"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
     </LinearLayout>
@@ -65,14 +65,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Hora: Seleccionar"
+            android:text="@string/selected_time_placeholder"
             android:textSize="16sp" />
 
         <Button
             android:id="@+id/btn_edit_select_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🕐"
+            android:text="@string/time_picker_icon"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
     </LinearLayout>
@@ -80,7 +80,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Categoría:"
+        android:text="@string/category_label"
         android:textSize="16sp"
         android:layout_marginBottom="8dp" />
 
@@ -98,7 +98,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Frecuencia:"
+        android:text="@string/frequency_label"
         android:textSize="16sp"
         android:layout_marginBottom="8dp" />
 
@@ -121,7 +121,7 @@
             android:id="@+id/btn_save_edit_reminder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Guardar Cambios"
+            android:text="@string/save_edit_button"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
@@ -138,7 +138,7 @@
         android:id="@+id/btn_cancel_edit_reminder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cancelar"
+        android:text="@string/cancel_edit_button"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:textColor="?attr/colorPrimary" />
 

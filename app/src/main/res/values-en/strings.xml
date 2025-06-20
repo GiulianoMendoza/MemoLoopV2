@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MemoLoop</string>
+    <string name="add_reminder_toolbar_title">Add Reminder</string>
+    <string name="reminder_details_section_title">Reminder Details</string>
+    <string name="reminder_title_hint">Reminder Title</string>
+    <string name="selected_date_placeholder">Date: Select</string>
+    <string name="date_picker_icon">📅</string>
+    <string name="selected_time_placeholder">Time: Select</string>
+    <string name="time_picker_icon">🕐</string>
+    <string name="category_label">Category:</string>
+    <string name="frequency_label">Frequency:</string>
+    <string name="add_image_button">Add Image (optional)</string>
+    <string name="select_location_button">Select location (optional)</string>
+    <string name="add_reminder_button">Add Reminder</string>
+    <string name="share_reminder_button">Share Reminder</string>
+
+    <!-- Individual text strings -->
+    <string name="menu_logout">Log Out</string>
+    <string name="my_reminders_toolbar_title">My Reminders</string>
+    <string name="no_reminders_message">No reminders. Click on the + to add one!</string>
+    <string name="filter_applied_toast">Filters applied</string>
+    <string name="view_invitations_button">View Invitations</string>
+    <string name="edit_reminder_title">Edit Reminder</string>
+    <string name="save_edit_button">Save Changes</string>
+    <string name="cancel_edit_button">Cancel</string>
+    <string name="delete_reminder_title">Delete Reminder</string>
+    <string name="delete_reminder_confirmation">Are you sure you want to delete \'%s\'?</string>
+    <string name="yes_delete_button">Yes, Delete</string>
+    <string name="no_cancel_button">Cancel</string>
+    <string name="reminder_deleted_success">Reminder successfully deleted</string>
+    <string name="error_user_not_authenticated">Error: User not authenticated</string>
+    <string name="error_loading_reminders">Error loading reminders: %s</string>
+    <string name="error_title_empty">Title cannot be empty</string>
+    <string name="error_completing_fields">Please complete all reminder fields</string>
+    <string name="notification_title_reminder">Reminder: %s</string>
+    <string name="notification_message_reminder">Your %s reminder is about to expire.</string>
+    <string name="notification_message_past_due">Your %s reminder has passed or is about to expire.</string>
+    <string name="error_scheduling_alarm">Could not schedule reminder. Please check app alarm permissions.</string>
+    <string name="share_dialog_hint_emails">Enter emails (comma separated)</string>
+    <string name="confirm_share_button">Confirm Share</string>
+    <string name="cancel_share_button">Cancel</string>
+    <string name="error_empty_emails">Please enter at least one email address.</string>
+    <string name="error_invalid_emails">Invalid email addresses.</string>
+    <string name="toast_cannot_share_self">You cannot share a reminder with yourself.</string>
+    <string name="toast_shared_with_users">Shared with %d user(s).</string>
+    <string name="toast_no_valid_users_found">No valid users found to share with.</string>
+    <string name="toast_error_fetching_users">Error fetching user: %s</string>
+    <string name="toast_error_all_users_not_found">Error: Could not fetch all users.</string>
+    <string name="toast_update_reminder_success">Reminder updated</string>
+    <string name="toast_update_reminder_error">Error updating reminder ID: %s</string>
+    <string name="toast_add_reminder_error">Error adding reminder: %s</string>
+    <string name="toast_reminder_added_shared">Reminder added and shared successfully</string>
+    <string name="toast_location_saved">Location saved</string>
+    <string name="toast_error_receiving_location">Error receiving location</string>
+    <string name="toast_no_coordinates_received">No coordinates received</string>
+    <string name="toast_operation_cancelled">Operation cancelled</string>
+    <string name="shared_with_loading">Shared with: Loading...</string>
+    <string name="shared_with_users">Shared with: %s</string>
+    <string name="shared_with_users_not_found">Shared with: Users not found</string>
+    <string name="shared_with_error_loading">Shared with: Error loading users</string>
+    <string name="shared_with_some_errors">Shared with: %s (some errors)</string>
+    <string name="event_with_user">Event with: %s</string>
+    <string name="frequency_label_short">FREQUENCY</string>
+    <string name="category_label_short">CATEGORY</string>
+    <string name="all_categories_filter">All Categories</string>
+    <string name="all_frequencies_filter">All Frequencies</string>
+    <string name="no_reminders_filter_match">No reminders match the filters.</string>
+    <string name="pending_invitations_found">You have pending invitations!</string>
+    <string name="no_pending_invitations">No pending invitations.</string>
+    <string name="dialog_edit_reminder_title">Edit Reminder</string>
+    <string name="dialog_share_reminder_title">Share Reminder</string>
+    <string name="toast_session_closed">Session closed</string>
+    <string name="welcome_message_placeholder">Welcome %s to MemoLoop, your reminder app</string>
+    <string name="empty_reminders_icon_description">Empty reminders icon</string>
+    <string name="add_new_reminder_description">Add new reminder</string>
+    <string name="invitations_toolbar_title">My Invitations</string>
+    <string name="pending_invitations_section_title">Pending Invitations</string>
+
+    <!-- Strings for LoginActivity -->
+    <string name="login_title">Login</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button_text">Login</string>
+    <string name="no_account_register_text">Don\'t have an account? Sign up here</string>
+
+    <!-- Strings for RegisterActivity -->
+    <string name="register_title">Create Account</string>
+    <string name="full_name_hint">Full Name</string>
+    <string name="phone_hint">Phone</string>
+    <string name="register_button_text">Register</string>
+    <string name="already_have_account_login_text">Already have an account? Log in here.</string>
+
+    <!-- New strings for ReminderDetailActivity -->
+    <string name="detail_title_placeholder">Title</string>
+    <string name="date_icon_description">Date icon</string>
+    <string name="detail_date_placeholder">Date</string>
+    <string name="time_icon_description">Time icon</string>
+    <string name="detail_time_placeholder">Time</string>
+    <string name="detail_frequency_label">Frequency</string>
+    <string name="detail_category_label">Category</string>
+    <string name="reminder_image_description">Reminder image</string>
+    <string name="download_image_button_description">Download image</string>
+    <string name="edit_button_text">Edit</string>
+    <string name="delete_button_text">Delete</string>
+
+    <!-- New strings for RemindersActivity -->
+    <string name="add_reminder_section_title">Add Reminder</string>
+    <string name="upcoming_reminders_section_title">Upcoming Reminders</string>
+    <string name="no_reminders_add_one_message_reminders_activity">No reminders. Add one!</string>
+    <string name="filter_reminders_title">Filter Reminders</string>
+    <string name="apply_filter_button">Apply Filter</string>
+
+    <!-- New strings for MainActivity (splash screen) -->
+    <string name="welcome_splash_title">Welcome to RecodatoryApp!</string>
+    <string name="loading_reminders_message">Loading your reminders...</string>
+
+    <!-- New strings for dialog_edit_reminder.xml -->
+    <string name="reminder_title_label">Reminder Title</string>
+    <string name="reminder_title_hint_short">Title</string>
+
+    <!-- New strings for dialog_share_reminder.xml -->
+    <string name="share_dialog_title">Share Reminder</string>
+    <string name="share_dialog_instruction">Enter the email addresses of the users you want to share with, separated by commas.</string>
+    <string name="share_emails_hint">emails@example.com, other@example.com</string>
+    <string name="share_button_text">Share</string>
+
+    <!-- New strings for item_invitation.xml -->
+    <string name="invitation_title_placeholder">Invitation: %s</string>
+    <string name="invitation_sender_placeholder">From: %s</string>
+    <string name="reject_button_text">Reject</string>
+    <string name="accept_button_text">Accept</string>
+
+    <!-- New strings for item_reminder.xml -->
+    <string name="reminder_title_placeholder_long">Long Reminder Title that gets cut off</string>
+    <string name="reminder_type_icon_description">Reminder type icon</string>
+    <string name="reminder_category_icon_description">Reminder category icon</string>
+    <string name="reminder_options_description">Reminder options</string>
+    <string name="shared_with_users_placeholder">Shared with: %s</string>
+
+    <!-- New string for MapPickerActivity -->
+    <string name="confirm_location_button">Confirm Location</string>
+
+    <!-- Nuevas cadenas para el toolbar inferior -->
+    <string name="history_description">History</string>
+    <string name="language_switcher_description">Change Language</string>
+
+    <!-- Arrays de cadenas -->
+    <string-array name="reminder_categories">
+        <item>Health</item>
+        <item>Sports</item>
+        <item>Leisure</item>
+        <item>Study</item>
+        <item>General</item>
+    </string-array>
+
+    <string-array name="reminder_frequencies">
+        <item>Occasional</item>
+        <item>Fixed</item>
+    </string-array>
+
+    <string-array name="filter_categories">
+        <item>All Categories</item>
+        <item>Health</item>
+        <item>Sports</item>
+        <item>Leisure</item>
+        <item>Study</item>
+        <item>General</item>
+    </string-array>
+
+    <string-array name="filter_frequencies">
+        <item>All Frequencies</item>
+        <item>Occasional</item>
+        <item>Fixed</item>
+    </string-array>
+</resources>

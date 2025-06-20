@@ -36,7 +36,7 @@
                 android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end"
-                tools:text="Título del Recordatorio Largo y que se corta" />
+                tools:text="@string/reminder_title_placeholder_long" />
 
             <LinearLayout
                 android:id="@+id/right_side_elements_container"
@@ -52,14 +52,14 @@
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
                     app:tint="#CC000000"
-                    android:contentDescription="Icono de tipo de recordatorio"/>
+                    android:contentDescription="@string/reminder_type_icon_description"/>
 
                 <ImageView
                     android:id="@+id/iv_category_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:contentDescription="Icono de categoría de recordatorio"
+                    android:contentDescription="@string/reminder_category_icon_description"
                     app:tint="@android:color/black"/>
 
                 <FrameLayout
@@ -81,7 +81,7 @@
                         android:layout_gravity="center"
                         android:background="@android:color/transparent"
                         android:src="@drawable/ic_more_vert"
-                        android:contentDescription="Opciones del recordatorio"
+                        android:contentDescription="@string/reminder_options_description"
                         app:tint="?android:attr/textColorSecondary" />
                 </FrameLayout>
             </LinearLayout>
@@ -105,7 +105,7 @@
                     android:layout_height="18dp"
                     android:src="@drawable/ic_date_range"
                     app:tint="#444444"
-                    android:contentDescription="Icono de fecha"/>
+                    android:contentDescription="@string/date_icon_description"/>
 
                 <TextView
                     android:id="@+id/tv_reminder_date"
@@ -128,7 +128,7 @@
                     android:layout_height="19dp"
                     android:src="@drawable/ic_access_time"
                     app:tint="#444444"
-                    android:contentDescription="Icono de tiempo"/>
+                    android:contentDescription="@string/time_icon_description"/>
 
                 <TextView
                     android:id="@+id/tv_reminder_time"
@@ -157,7 +157,7 @@
                     android:id="@+id/tv_type_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="FRECUENCIA"
+                    android:text="@string/frequency_label_short"
                     android:textColor="#A6000000"
                     android:textSize="11sp"
                     android:textStyle="bold"/>
@@ -182,7 +182,7 @@
                     android:id="@+id/tv_category_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="CATEGORÍA"
+                    android:text="@string/category_label_short"
                     android:textColor="#A6000000"
                     android:textSize="11sp"
                     android:textStyle="bold"/>
@@ -206,7 +206,7 @@
             android:textColor="@color/purple_500"
             android:textStyle="italic"
             android:visibility="gone"
-            tools:text="Compartido con: John, Jane, Pedro" />
+            tools:text="@string/shared_with_users_placeholder" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

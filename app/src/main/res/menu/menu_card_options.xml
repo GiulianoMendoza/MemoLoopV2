@@ -2,8 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_edit"
-        android:title="Editar" />
+        android:title="@string/menu_edit" />
     <item
         android:id="@+id/action_delete"
-        android:title="Eliminar" />
+        android:title="@string/menu_delete" />
+    <item
+        android:id="@+id/action_share"
+        android:title="@string/menu_share" />
 </menu>

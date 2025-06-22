@@ -37,6 +37,7 @@
     <string name="error_scheduling_alarm">No se pudo programar el recordatorio. Por favor, revisa los permisos de alarma de la aplicación.</string>
     <string name="share_dialog_hint_emails">Ingresa correos electrónicos (separados por coma)</string>
     <string name="confirm_share_button">Confirmar Compartir</string>
+    <string name="confirm_edit_button">Confirmar Edición</string>
     <string name="cancel_share_button">Cancelar</string>
     <string name="error_empty_emails">Por favor, ingresa al menos un correo electrónico.</string>
     <string name="error_invalid_emails">Correos electrónicos no válidos.</string>
@@ -132,6 +133,110 @@
     <string name="history_description">Historial</string>
     <string name="language_switcher_description">Cambiar Idioma</string>
 
+    <string name="toast_error_uploading_image">Error al subir imagen</string>
+    <string name="image_upload_failed">Fallo al subir imagen</string>
+    <string name="image_selected">Imagen seleccionada.</string>
+    <string name="image_taken">Foto tomada exitosamente.</string>
+    <string name="image_capture_failed">Fallo al capturar la imagen.</string>
+    <string name="error_creating_image_file">Error al crear archivo de imagen temporal.</string>
+    <string name="take_photo_option">Tomar foto</string>
+    <string name="choose_from_gallery_option">Elegir de la galería</string>
+    <string name="select_image_title">Seleccionar imagen</string>
+    <string name="select_image_button">Seleccionar Imagen</string>
+    <string name="change_image_button">Cambiar Imagen</string>
+    <string name="toast_no_map_data_received">No se recibieron datos del mapa</string>
+
+
+    <string name="error_loading_invitations">Error al cargar invitaciones: %s</string>
+    <string name="error_session_not_started">Error: Sesión no iniciada.</string>
+    <string name="toast_reminder_accepted">Recordatorio \'%s\' aceptado.</string>
+    <string name="toast_error_deleting_invitation">Error al eliminar invitación: %s</string>
+    <string name="toast_error_accepting_reminder">Error al aceptar recordatorio: %s</string>
+    <string name="toast_invitation_rejected">Invitación rechazada.</string>
+    <string name="toast_error_rejecting_invitation">Error al rechazar invitación: %s</string>
+    <string name="error_scheduling_alarm_check_permissions">No se pudo programar el recordatorio. Por favor, revisa los permisos de alarma de la aplicación.</string>
+
+    <string name="error_completing_fields_login">Por favor, complete todos los campos</string>
+    <string name="toast_login_success">Inicio de sesión exitoso</string>
+    <string name="error_login_failed">Error: %s</string>
+
+    <string name="error_completing_fields_register">Por favor, complete todos los campos</string>
+    <string name="error_invalid_email">Correo electrónico inválido</string>
+    <string name="error_password_length">La contraseña debe tener al menos 6 caracteres</string>
+    <string name="toast_register_success">Registro exitoso</string>
+    <string name="error_saving_user_data">Error guardando datos: %s</string>
+    <string name="error_register_failed">Error: %s</string>
+
+    <string name="error_loading_reminder_detail">Error al cargar el recordatorio</string>
+    <string name="toast_reminder_not_found">Recordatorio no encontrado</string>
+    <string name="error_fetching_reminder_detail">Error al obtener el recordatorio</string>
+    <string name="map_location_title">Ubicación guardada</string>
+    <string name="delete_reminder_title_dialog">Eliminar recordatorio</string>
+    <string name="delete_reminder_confirmation_detail">¿Estás seguro de que deseas eliminar este recordatorio?</string>
+    <string name="yes_delete_button_short">Eliminar</string>
+    <string name="toast_reminder_deleted">Recordatorio eliminado</string>
+    <string name="error_deleting_reminder_detail">Error al eliminar el recordatorio</string>
+    <string name="download_image_title">Descargando %s</string>
+    <string name="download_image_description">Descargando imagen del recordatorio...</string>
+    <string name="toast_download_started">Descarga iniciada</string>
+
+    <string name="error_deleting_reminder">Error al eliminar recordatorio: %s</string>
+
+    <string name="welcome_screen_initialized_log">Pantalla de bienvenida inicializada</string>
+    <string name="toast_session_not_started_login_prompt">Sesión no iniciada. Por favor, inicie sesión.</string>
+    <string name="toast_loading_reminders">Cargando tus recordatorios...</string>
+    <string name="error_checking_personal_reminders_log">Error al verificar recordatorios propios: %s</string>
+    <string name="log_no_reminders_no_invitations">No hay recordatorios ni invitaciones. Mostrando pantalla de bienvenida sin recordatorios.</string>
+    <string name="log_pending_invitations_found">Tienes invitaciones pendientes. Mostrando pantalla de bienvenida con indicador.</string>
+    <string name="error_checking_invitations_log">Error al verificar invitaciones: %s</string>
+    <string name="error_checking_invitations">Error al verificar invitaciones: %s</string>
+    <string name="tv_no_reminders_info_has_invitations">¡Tienes invitaciones pendientes! Haz clic para verlas.</string>
+    <string name="toast_redirecting_add_reminder">Redirigiendo para agregar recordatorios...</string>
+    <string name="welcome_message_fallback">Bienvenido a MemoLoop, tu app de recordatorios</string>
+    <string name="toast_error_loading_username">No se pudo cargar el nombre del usuario</string>
+    <string name="error_loading_user_data_firestore_log">Error al cargar datos del usuario desde Firestore: %s</string>
+    <string name="toast_error_loading_name">Error al cargar el nombre: %s</string>
+
+    <string name="default_reminder_title">Recordatorio</string>
+    <string name="default_reminder_message">¡Es hora de tu recordatorio!</string>
+
+    <string name="notification_channel_name">Recordatorios MemoLoop</string>
+    <string name="notification_channel_description">Notificaciones para tus recordatorios de MemoLoop</string>
+
+    <string name="toast_request_exact_alarm_permission">Por favor, conceda el permiso para programar alarmas exactas para notificaciones.</string>
+    <string name="toast_permissions_granted">Permisos de notificación concedidos.</string>
+    <string name="toast_permissions_denied">Algunos permisos de notificación fueron denegados. La funcionalidad podría verse afectada.</string>
+
+    <string name="invitation_title_with_name">Invitación: %s</string>
+    <string name="invitation_sender_with_name">De: %s</string>
+    <string name="unknown_user">Usuario Desconocido</string>
+    <string name="toast_user_not_found">Usuario con correo \'%s\' no encontrado.</string>
+    <string name="reminder_type_occasional">Eventual</string>
+    <string name="reminder_type_fixed">Fijo</string>
+    <string name="reminder_type_daily">Diario</string>
+    <string name="reminder_type_weekly">Semanal</string>
+    <string name="reminder_type_monthly">Mensual</string>
+    <string name="reminder_type_annual">Anual</string>
+    <string name="reminder_category_salud_raw">Salud</string>
+    <string name="reminder_category_deporte_raw">Deporte</string>
+    <string name="reminder_category_ocio_raw">Ocio</string>
+    <string name="reminder_category_estudio_raw">Estudio</string>
+    <string name="reminder_category_general_raw">General</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="toast_reminder_updated_successfully">Recordatorio actualizado exitosamente</string>
+    <string name="toast_error_updating_reminder">Error al actualizar recordatorio: %1$s</string>
+    <string name="toast_reminder_added_successfully">Recordatorio agregado exitosamente</string>
+    <string name="toast_error_saving_reminder">Error al guardar recordatorio: %1$s</string>
+    <string name="toast_error_adding_reminder">Error al agregar recordatorio: %s</string>
+    <string name="edit_reminder_toolbar_title">Editar Recordatorio</string>
+    <string name="error_uploading_image">Error al subir imagen</string>
+    <string name="permission_denied_image">Se necesitan permisos para la cámara o la galería para agregar una imagen.</string>
+    <string name="menu_edit">Editar</string>
+    <string name="menu_delete">Eliminar</string>
+    <string name="menu_share">Compartir</string>
+
+    <string name="select_text">Seleccionar</string>
+
     <string-array name="reminder_categories">
         <item>Salud</item>
         <item>Deporte</item>
@@ -160,4 +265,5 @@
         <item>Fijo</item>
     </string-array>
     <string name="add_reminder_toolbar_title">Agregar Recordatorio</string>
+
 </resources>

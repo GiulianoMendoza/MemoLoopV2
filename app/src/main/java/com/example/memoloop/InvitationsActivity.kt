@@ -41,7 +41,7 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
         val toolbar: Toolbar = findViewById(R.id.toolbar_invitations)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Mis Invitaciones"
+        supportActionBar?.title = getString(R.string.invitations_toolbar_title)
 
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         auth = FirebaseAuth.getInstance()
@@ -74,7 +74,7 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
     private fun loadInvitations() {
         val userId = auth.currentUser?.uid ?: run {
             Log.e("InvitationsActivity", "User not authenticated when loading invitations.")
-            Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.error_user_not_authenticated), Toast.LENGTH_LONG).show()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
@@ -84,7 +84,7 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.w("InvitationsActivity", "Listen failed.", e)
-                    Toast.makeText(this, "Error al cargar invitaciones: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.error_loading_invitations, e.message), Toast.LENGTH_SHORT).show()
                     return@addSnapshotListener
                 }
 
@@ -99,7 +99,7 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
                             reminderTimestamp = doc.getLong("reminderTimestamp") ?: 0L,
                             reminderType = doc.getString("reminderType") ?: "",
                             reminderCategory = doc.getString("reminderCategory") ?: "",
-                            sharedFromUserName = doc.getString("sharedFromUserName") ?: "Usuario Desconocido"
+                            sharedFromUserName = doc.getString("sharedFromUserName") ?: getString(R.string.unknown_user)
                         )
                         invitations.add(invitation)
                     }
@@ -130,7 +130,7 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
     override fun onAcceptClick(invitation: Invitation) {
         val userId = auth.currentUser?.uid
         if (userId == null) {
-            Toast.makeText(this, "Error: Sesión no iniciada.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_session_not_started), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -155,7 +155,7 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
                     .document(invitation.id)
                     .delete()
                     .addOnSuccessListener {
-                        Toast.makeText(this, "Recordatorio '${invitation.reminderTitle}' aceptado.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.toast_reminder_accepted, invitation.reminderTitle), Toast.LENGTH_SHORT).show()
                         firebaseAnalytics.logEvent("invitation_accepted") {
                             param("user_id", userId)
                             param("reminder_id", invitation.reminderId)
@@ -164,12 +164,12 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
                         scheduleReminderNotification(acceptedReminder, acceptedReminder.id)
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error al eliminar invitación: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, getString(R.string.toast_error_deleting_invitation, e.message), Toast.LENGTH_LONG).show()
                         Log.e("InvitationsActivity", "Error deleting invitation: ${e.message}", e)
                     }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al aceptar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.toast_error_accepting_reminder, e.message), Toast.LENGTH_LONG).show()
                 Log.e("InvitationsActivity", "Error accepting reminder: ${e.message}", e)
             }
     }
@@ -178,7 +178,7 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
     override fun onRejectClick(invitation: Invitation) {
         val userId = auth.currentUser?.uid
         if (userId == null) {
-            Toast.makeText(this, "Error: Sesión no iniciada.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_session_not_started), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -186,7 +186,8 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
             .document(invitation.id)
             .delete()
             .addOnSuccessListener {
-                Toast.makeText(this, "Invitación rechazada.", Toast.LENGTH_SHORT).show()
+                // Usar cadena de recurso
+                Toast.makeText(this, getString(R.string.toast_invitation_rejected), Toast.LENGTH_SHORT).show()
                 firebaseAnalytics.logEvent("invitation_rejected") {
                     param("user_id", userId)
                     param("reminder_id", invitation.reminderId)
@@ -194,7 +195,7 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
                 }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al rechazar invitación: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.toast_error_rejecting_invitation, e.message), Toast.LENGTH_LONG).show()
                 Log.e("InvitationsActivity", "Error rejecting invitation: ${e.message}", e)
             }
     }
@@ -202,25 +203,23 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
     private fun scheduleReminderNotification(reminder: Reminder, reminderId: String) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val notificationId = reminderId.hashCode()
-
-        // Calcula la hora de la notificación 5 minutos antes del recordatorio
         val notificationTime = Calendar.getInstance().apply {
             timeInMillis = reminder.timestamp
-            add(Calendar.MINUTE, -5) // Resta 5 minutos
+            add(Calendar.MINUTE, -5)
         }.timeInMillis
         if (notificationTime <= System.currentTimeMillis()) {
             Log.d("InvitationsActivity", "Notification time for ${reminder.title} is in the past or too soon, showing immediately.")
             notificationHelper.showNotification(
-                "Recordatorio: ${reminder.title}",
-                "Tu recordatorio de ${reminder.category} ya pasó o está a punto de vencer.",
+                getString(R.string.notification_title_reminder, reminder.title),
+                getString(R.string.notification_message_past_due, reminder.category),
                 notificationId
             )
             return
         }
 
         val intent = Intent(this, NotificationPublisher::class.java).apply {
-            putExtra(NotificationPublisher.REMINDER_TITLE_EXTRA, "Recordatorio: ${reminder.title}")
-            putExtra(NotificationPublisher.REMINDER_MESSAGE_EXTRA, "Tu recordatorio de ${reminder.category} está a punto de vencer.")
+            putExtra(NotificationPublisher.REMINDER_TITLE_EXTRA, getString(R.string.notification_title_reminder, reminder.title))
+            putExtra(NotificationPublisher.REMINDER_MESSAGE_EXTRA, getString(R.string.notification_message_reminder, reminder.category))
             putExtra(NotificationPublisher.NOTIFICATION_ID_EXTRA, notificationId)
             putExtra(NotificationPublisher.REMINDER_ID_EXTRA, reminderId)
         }
@@ -241,7 +240,7 @@ class InvitationsActivity : BaseActivity(), InvitationAdapter.OnInvitationAction
             Log.d("InvitationsActivity", "Scheduled notification for ${reminder.title} at ${SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date(notificationTime))}")
         } catch (e: SecurityException) {
             Log.e("InvitationsActivity", "SecurityException al programar alarma: ${e.message}", e)
-            Toast.makeText(this, "No se pudo programar el recordatorio. Revisar permisos.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.error_scheduling_alarm_check_permissions), Toast.LENGTH_LONG).show()
         }
     }
 }

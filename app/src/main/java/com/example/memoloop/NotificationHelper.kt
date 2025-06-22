@@ -9,8 +9,8 @@ import androidx.core.app.NotificationCompat
 class NotificationHelper(private val context: Context) {
 
     private val CHANNEL_ID = "memoloop_reminder_channel"
-    private val CHANNEL_NAME = "Recordatorios MemoLoop"
-    private val CHANNEL_DESCRIPTION = "Notificaciones para tus recordatorios de MemoLoop"
+    private val CHANNEL_NAME = context.getString(R.string.notification_channel_name)
+    private val CHANNEL_DESCRIPTION = context.getString(R.string.notification_channel_description)
 
     init {
         createNotificationChannel()

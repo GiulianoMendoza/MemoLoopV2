@@ -133,6 +133,108 @@
     <string name="history_description">History</string>
     <string name="language_switcher_description">Change Language</string>
 
+    <string name="toast_error_uploading_image">Error uploading image</string>
+    <string name="image_upload_failed">Failed to upload image</string>
+    <string name="image_selected">Selected image.</string>
+    <string name="image_taken">Photo taken successfully.</string>
+    <string name="image_capture_failed">Failed to capture image.</string>
+    <string name="error_creating_image_file">Error creating temporary image file.</string>
+    <string name="take_photo_option">Take photo</string>
+    <string name="choose_from_gallery_option">Choose from gallery</string>
+    <string name="select_image_title">Select image</string>
+    <string name="toast_error_adding_reminder">Error adding reminder: %s</string>
+    <string name="edit_reminder_toolbar_title">Edit Reminder</string>
+    <string name="error_uploading_image">Error uploading image</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="permission_denied_image">Se necesitan permisos para la cámara o la galería para agregar una imagen.</string>
+    <string name="toast_reminder_updated_successfully">Reminder updated successfully</string>
+    <string name="toast_error_updating_reminder">Error updating reminder: %1$s</string>
+    <string name="toast_reminder_added_successfully">Reminder added successfully</string>
+    <string name="toast_error_saving_reminder">Error saving reminder: %1$s</string>
+    <string name="error_loading_invitations">Error loading invitations: %s</string>
+    <string name="error_session_not_started">Error: Session not started.</string>
+    <string name="toast_reminder_accepted">Reminder \'%s\' accepted.</string>
+    <string name="toast_error_deleting_invitation">Error deleting invitation: %s</string>
+    <string name="toast_error_accepting_reminder">Error accepting reminder: %s</string>
+    <string name="toast_invitation_rejected">Invitation rejected.</string>
+    <string name="toast_error_rejecting_invitation">Error rejecting invitation: %s</string>
+    <string name="error_scheduling_alarm_check_permissions">Could not schedule reminder. Please check app alarm permissions.</string>
+
+
+    <string name="error_completing_fields_login">Please complete all fields</string>
+    <string name="toast_login_success">Login successful</string>
+    <string name="error_login_failed">Error: %s</string>
+
+    <string name="error_completing_fields_register">Please complete all fields</string>
+    <string name="error_invalid_email">Invalid email address</string>
+    <string name="error_password_length">Password must be at least 6 characters long</string>
+    <string name="toast_register_success">Registration successful</string>
+    <string name="error_saving_user_data">Error saving data: %s</string>
+    <string name="error_register_failed">Error: %s</string>
+
+    <string name="error_loading_reminder_detail">Error loading reminder</string>
+    <string name="toast_reminder_not_found">Reminder not found</string>
+    <string name="error_fetching_reminder_detail">Error fetching reminder</string>
+    <string name="map_location_title">Saved location</string>
+    <string name="delete_reminder_title_dialog">Delete reminder</string>
+    <string name="delete_reminder_confirmation_detail">Are you sure you want to delete this reminder?</string>
+    <string name="yes_delete_button_short">Delete</string>
+    <string name="toast_reminder_deleted">Reminder deleted</string>
+    <string name="error_deleting_reminder_detail">Error deleting reminder</string>
+    <string name="download_image_title">Downloading %s</string>
+    <string name="download_image_description">Downloading reminder image...</string>
+    <string name="toast_download_started">Download started</string>
+
+    <string name="error_deleting_reminder">Error deleting reminder: %s</string>
+
+    <string name="welcome_screen_initialized_log">Welcome screen initialized</string>
+    <string name="toast_session_not_started_login_prompt">Session not started. Please log in.</string>
+    <string name="toast_loading_reminders">Loading your reminders...</string>
+    <string name="error_checking_personal_reminders_log">Error checking personal reminders: %s</string>
+    <string name="log_no_reminders_no_invitations">No reminders or invitations. Showing welcome screen without reminders.</string>
+    <string name="log_pending_invitations_found">You have pending invitations. Showing welcome screen with indicator.</string>
+    <string name="error_checking_invitations_log">Error checking invitations: %s</string>
+    <string name="error_checking_invitations">Error checking invitations: %s</string>
+    <string name="tv_no_reminders_info_has_invitations">You have pending invitations! Click to view them.</string>
+    <string name="toast_redirecting_add_reminder">Redirecting to add reminders...</string>
+    <string name="welcome_message_fallback">Welcome to MemoLoop, your reminder app</string>
+    <string name="toast_error_loading_username">Could not load username</string>
+    <string name="error_loading_user_data_firestore_log">Error loading user data from Firestore: %s</string>
+    <string name="toast_error_loading_name">Error loading name: %s</string>
+
+    <string name="default_reminder_title">Reminder</string>
+    <string name="default_reminder_message">It\'s time for your reminder!</string>
+
+    <string name="notification_channel_name">MemoLoop Reminders</string>
+    <string name="notification_channel_description">Notifications for your MemoLoop reminders</string>
+
+    <string name="toast_request_exact_alarm_permission">Please grant permission to schedule exact alarms for notifications.</string>
+    <string name="toast_permissions_granted">Notification permissions granted.</string>
+    <string name="toast_permissions_denied">Some notification permissions were denied. Functionality might be affected.</string>
+
+    <string name="invitation_title_with_name">Invitation: %s</string>
+    <string name="invitation_sender_with_name">From: %s</string>
+    <string name="unknown_user">Unknown User</string>
+    <string name="toast_no_map_data_received">No map data received</string>
+    <string name="toast_user_not_found">User with email \'%s\' not found.</string>
+    <string name="reminder_type_occasional">Occasional</string>
+    <string name="reminder_type_fixed">Fixed</string>
+    <string name="reminder_type_daily">Daily</string>
+    <string name="reminder_type_weekly">Weekly</string>
+    <string name="reminder_type_monthly">Monthly</string>
+    <string name="reminder_type_annual">Annual</string>
+    <string name="reminder_category_salud_raw">Health</string>
+    <string name="reminder_category_deporte_raw">Sport</string>
+    <string name="reminder_category_ocio_raw">Leisure</string>
+    <string name="reminder_category_estudio_raw">Study</string>
+    <string name="reminder_category_general_raw">General</string>
+    <string name="confirm_edit_button">Confirm edit</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_share">Share</string>
+
+    <string name="select_text">Select</string>
+
     <string-array name="reminder_categories">
         <item>Health</item>
         <item>Sports</item>

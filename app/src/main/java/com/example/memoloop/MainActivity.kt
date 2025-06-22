@@ -14,9 +14,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private val REQUEST_NOTIFICATION_PERMISSIONS = 100
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(LanguageManager.updateBaseContextLocale(newBase!!))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,10 +32,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkAndRequestPermissions() {
         val permissionsToRequest = mutableListOf<String>()
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
             if (!alarmManager.canScheduleExactAlarms()) {
+                Toast.makeText(this, getString(R.string.toast_request_exact_alarm_permission), Toast.LENGTH_LONG).show()
                 val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
                 startActivity(intent)
                 return
@@ -55,23 +58,23 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_NOTIFICATION_PERMISSIONS) {
             var allGranted = true
-            for (result in grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
+            for (i in grantResults.indices) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                     allGranted = false
                     break
                 }
-                if (permissions[0] == Manifest.permission.SCHEDULE_EXACT_ALARM && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                    if (!alarmManager.canScheduleExactAlarms()) {
-                        allGranted = false
-                    }
+            }
+            if (allGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                if (!alarmManager.canScheduleExactAlarms()) {
+                    allGranted = false
                 }
             }
 
             if (allGranted) {
-                Toast.makeText(this, "Permisos de notificación concedidos.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_permissions_granted), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Algunos permisos de notificación fueron denegados. La funcionalidad podría verse afectada.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.toast_permissions_denied), Toast.LENGTH_LONG).show()
             }
             redirectToAppropriateActivity()
         }

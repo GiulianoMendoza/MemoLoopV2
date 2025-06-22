@@ -1,6 +1,7 @@
 package com.example.memoloop
 
 import android.app.Activity
+import android.content.Context // Importar Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -20,11 +21,14 @@ import org.maplibre.android.style.layers.PropertyFactory.*
 import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.sources.GeoJsonSource
 
-class MapPickerActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapPickerActivity : BaseActivity(), OnMapReadyCallback {
 
     private lateinit var mapView: MapView
     private var mapLibreMap: MapLibreMap? = null
     private var selectedLatLng: LatLng? = null
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(LanguageManager.updateBaseContextLocale(newBase!!))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +38,6 @@ class MapPickerActivity : AppCompatActivity(), OnMapReadyCallback {
         mapView = findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-
         findViewById<Button>(R.id.btn_confirm_location).setOnClickListener {
             selectedLatLng?.let {
                 Intent().apply {
@@ -56,12 +59,9 @@ class MapPickerActivity : AppCompatActivity(), OnMapReadyCallback {
         map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
             val sourceId = "marker-source"
             val layerId = "marker-layer"
-
-            //Fuente de datos para el marcador
             val geoJsonSource = GeoJsonSource(sourceId)
             style.addSource(geoJsonSource)
 
-            //Capa para mostrar el ícono
             val symbolLayer = SymbolLayer(layerId, sourceId).withProperties(
                 iconImage("marker-icon"),
                 iconAllowOverlap(true),
@@ -69,11 +69,9 @@ class MapPickerActivity : AppCompatActivity(), OnMapReadyCallback {
             )
             style.addLayer(symbolLayer)
 
-            //Ícono del marcador (en drawable)
             val bitmap = BitmapFactory.decodeResource(resources, R.drawable.marker_icon)
             style.addImage("marker-icon", bitmap)
 
-            // Mover cámara a Buenos Aires
             map.cameraPosition = CameraPosition.Builder()
                 .target(LatLng(-34.6037, -58.3816))
                 .zoom(12.0)
@@ -93,7 +91,6 @@ class MapPickerActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    // Ciclo de vida
     override fun onStart() = super.onStart().also { mapView.onStart() }
     override fun onResume() = super.onResume().also { mapView.onResume() }
     override fun onPause() = super.onPause().also { mapView.onPause() }

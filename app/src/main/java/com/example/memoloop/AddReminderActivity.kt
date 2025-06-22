@@ -4,19 +4,18 @@ import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Base64
+import android.util.Base64 // Importación necesaria para Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import android.app.Activity
-import android.net.Uri
-import android.content.Context
-import androidx.core.content.FileProvider
+import android.net.Uri // Importación necesaria para Uri
+import androidx.core.content.FileProvider // Importación necesaria para FileProvider
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
@@ -26,8 +25,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
-import com.example.memoloop.ImgbbResponse
-import com.example.memoloop.network.ImgbbService
+import com.example.memoloop.ImgbbResponse // Asumo que estas clases están definidas en tu proyecto
+import com.example.memoloop.network.ImgbbService // Asumo que estas clases están definidas en tu proyecto
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -37,9 +36,12 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-import java.io.File
+import java.io.File // Importación necesaria para File
 import java.text.SimpleDateFormat
 import java.util.*
+
+// Se asume que ReminderConstants, Reminder, ImgbbResponse, ImgbbService e Invitation
+// están importadas de sus propios archivos.
 
 class AddReminderActivity : BaseActivity() {
 
@@ -53,9 +55,9 @@ class AddReminderActivity : BaseActivity() {
     private lateinit var tvSelectedTime: TextView
     private lateinit var btnSelectDate: Button
     private lateinit var btnSelectTime: Button
-    private lateinit var btnSelectImage: Button
+    private lateinit var btnSelectImage: Button // Botón para seleccionar/tomar imagen
     private lateinit var spinnerCategory: Spinner
-    private lateinit var spinnerType: Spinner
+    private lateinit var spinnerFrequency: Spinner
     private lateinit var btnAddReminder: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var btnShareReminder: Button
@@ -67,24 +69,27 @@ class AddReminderActivity : BaseActivity() {
     private var currentUserName: String = ""
     private var selectedLatitude: Double? = null
     private var selectedLongitude: Double? = null
-    private var selectedImageUri: Uri? = null
-    private var capturedImageUri: Uri? = null
+    private var selectedImageUri: Uri? = null // Uri de la imagen seleccionada de galería o cámara
+    private var capturedImageUri: Uri? = null // Uri temporal para la imagen tomada con la cámara
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(LanguageManager.updateBaseContextLocale(newBase!!))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_reminders)
+        val contentFrame = findViewById<FrameLayout>(R.id.content_frame)
+        LayoutInflater.from(this).inflate(R.layout.activity_add_reminders, contentFrame, true)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar_main)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Agregar Recordatorio"
+        supportActionBar?.title = getString(R.string.add_reminder_toolbar_title)
 
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
         notificationHelper = NotificationHelper(this)
-
-
 
         initViews()
         setupSpinners()
@@ -92,51 +97,51 @@ class AddReminderActivity : BaseActivity() {
         loadCurrentUserName()
 
         val isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
-        setupSaveButton(isEditMode)
+        setupSaveButton(isEditMode) // Configura el texto y listener del botón Add/Edit
         if (isEditMode) {
-            supportActionBar?.title = "Editar Recordatorio"
+            supportActionBar?.title = getString(R.string.edit_reminder_toolbar_title)
             loadReminderData()
         } else {
-            supportActionBar?.title = "Agregar Recordatorio"
+            supportActionBar?.title = getString(R.string.add_reminder_toolbar_title)
         }
     }
 
     private fun setupSaveButton(isEditMode: Boolean) {
         val saveButton = findViewById<Button>(R.id.btn_add_reminder)
-        saveButton.text = if (isEditMode) "Confirmar Edición" else "Agregar Recordatorio"
+        saveButton.text = if (isEditMode) getString(R.string.confirm_edit_button) else getString(R.string.add_reminder_button)
         saveButton.setOnClickListener { addReminder() }
     }
 
     private fun setupSpinnersWithSelection(selectedCategory: String?, selectedType: String?) {
-        // Configurar spinner de categoría
         val categories = resources.getStringArray(R.array.reminder_categories)
         val categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategory.adapter = categoryAdapter
 
-        // Configurar spinner de tipo/frecuencia
         val types = resources.getStringArray(R.array.reminder_frequencies)
         val typeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerType.adapter = typeAdapter
+        spinnerFrequency.adapter = typeAdapter
 
         // Establecer selección en el spinner de categoría si existe
-        selectedCategory?.let {
-            val categoryPosition = categories.indexOf(it)
+        selectedCategory?.let { categoryKey ->
+            val categoryDisplayName = ReminderConstants.getCategoryDisplayName(this, categoryKey)
+            val categoryPosition = categories.indexOf(categoryDisplayName)
             if (categoryPosition >= 0) {
                 spinnerCategory.setSelection(categoryPosition)
             } else {
-                Log.w("AddReminder", "Categoría no encontrada en el array: $it")
+                Log.w("AddReminder", "Categoría no encontrada en el array: $categoryDisplayName (key: $categoryKey)")
             }
         }
 
         // Establecer selección en el spinner de tipo si existe
-        selectedType?.let {
-            val typePosition = types.indexOf(it)
+        selectedType?.let { typeKey ->
+            val typeDisplayName = ReminderConstants.getTypeDisplayName(this, typeKey)
+            val typePosition = types.indexOf(typeDisplayName)
             if (typePosition >= 0) {
-                spinnerType.setSelection(typePosition)
+                spinnerFrequency.setSelection(typePosition)
             } else {
-                Log.w("AddReminder", "Tipo no encontrado en el array: $it")
+                Log.w("AddReminder", "Tipo no encontrado en el array: $typeDisplayName (key: $typeKey)")
             }
         }
     }
@@ -153,23 +158,23 @@ class AddReminderActivity : BaseActivity() {
             updateTimeDisplay()
         }
 
-        // Establecer categoría y tipo
         val category = intent.getStringExtra("CATEGORY")
         val type = intent.getStringExtra("TYPE")
-
         setupSpinnersWithSelection(category, type)
-
 
         selectedLatitude = intent.getDoubleExtra("LATITUDE", Double.NaN).takeIf { !it.isNaN() }
         selectedLongitude = intent.getDoubleExtra("LONGITUDE", Double.NaN).takeIf { !it.isNaN() }
 
-        // Usuarios compartidos
         sharedWithUserIds = intent.getStringArrayListExtra("SHARED_WITH")?.toMutableList() ?: mutableListOf()
 
-        // Imagen (necesitarías cargar la imagen desde la URL si existe)
+        // Si hay una imagen URL, podrías querer cargarla o mostrar un indicador de que ya existe una imagen
         val imageUrl = intent.getStringExtra("IMAGE_URL")
         if (!imageUrl.isNullOrEmpty()) {
-            // Implementa la carga de la imagen aquí
+            // Aquí podrías cargar la imagen en un ImageView si tu layout lo tuviera.
+            // Por ahora, solo logueamos que hay una URL.
+            Log.d("AddReminderActivity", "Reminder has existing image URL: $imageUrl")
+            // Podrías cambiar el texto del botón btnSelectImage a "Cambiar Imagen"
+            btnSelectImage.text = getString(R.string.change_image_button)
         }
     }
 
@@ -185,28 +190,33 @@ class AddReminderActivity : BaseActivity() {
         btnSelectDate = findViewById(R.id.btn_select_date)
         btnSelectTime = findViewById(R.id.btn_select_time)
         spinnerCategory = findViewById(R.id.spinner_category)
-        spinnerType = findViewById(R.id.spinner_type) // Inicialización de spinnerType
+        spinnerFrequency = findViewById(R.id.spinner_type)
         btnAddReminder = findViewById(R.id.btn_add_reminder)
         progressBar = findViewById(R.id.progress_bar)
         btnShareReminder = findViewById(R.id.btn_share_reminder)
         btnSelectLocation = findViewById(R.id.btn_select_location)
-        btnSelectImage = findViewById(R.id.btn_select_image)
+        btnSelectImage = findViewById(R.id.btn_select_image) // Inicializa el botón de imagen
 
-        val btnSelectLocation: Button = findViewById(R.id.btn_select_location)
         btnSelectLocation.setOnClickListener {
             val intent = Intent(this, MapPickerActivity::class.java)
             locationPicker.launch(intent)
         }
+
+        btnSelectImage.setOnClickListener {
+            showImageSourceDialog() // Muestra diálogo para seleccionar fuente de imagen
+        }
     }
 
     private fun setupSpinners() {
-
+        // La configuración inicial de spinners se realiza aquí si no hay selección previa (modo add)
+        // La lógica para selección existente se maneja en setupSpinnersWithSelection
+        setupSpinnersWithSelection(null, null)
     }
 
     private fun setupClickListeners() {
         btnSelectDate.setOnClickListener { showDatePicker() }
         btnSelectTime.setOnClickListener { showTimePicker() }
-        btnAddReminder.setOnClickListener { addReminder() }
+        // btnAddReminder.setOnClickListener { addReminder() } // Se mueve a setupSaveButton para manejar modo edición
         btnShareReminder.setOnClickListener { showShareReminderDialog() }
     }
 
@@ -215,18 +225,13 @@ class AddReminderActivity : BaseActivity() {
         if (userId != null) {
             firestore.collection("users").document(userId).get()
                 .addOnSuccessListener { document ->
-                    currentUserName = document.getString("name") ?: "Usuario Desconocido"
+                    currentUserName = document.getString("name") ?: getString(R.string.unknown_user)
                     Log.d("AddReminderActivity", "Current user name loaded: $currentUserName")
                 }
                 .addOnFailureListener { e ->
                     Log.e("AddReminderActivity", "Error loading current user name: ${e.message}", e)
                 }
         }
-        btnSelectImage.setOnClickListener {
-            //imagePickerLauncher.launch("image/*")
-            showImageSourceDialog()
-        }
-
     }
 
     private fun showDatePicker() {
@@ -278,20 +283,20 @@ class AddReminderActivity : BaseActivity() {
                     selectedLongitude = data.getDoubleExtra("longitude", Double.NaN)
 
                     if (!selectedLatitude!!.isNaN() && !selectedLongitude!!.isNaN()) {
-                        Toast.makeText(this, "Ubicación guardada", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.toast_location_saved), Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(this, "Error al recibir la ubicación", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.toast_error_receiving_location), Toast.LENGTH_SHORT).show()
                         selectedLatitude = null
                         selectedLongitude = null
                     }
                 } else {
-                    Toast.makeText(this, "No se recibieron coordenadas", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.toast_no_coordinates_received), Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(this, "No se recibieron datos del mapa", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_no_map_data_received), Toast.LENGTH_SHORT).show() // Corregido el mensaje
             }
         } else {
-            Toast.makeText(this, "Operación cancelada", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_operation_cancelled), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -300,20 +305,67 @@ class AddReminderActivity : BaseActivity() {
     ) { uri ->
         if (uri != null) {
             selectedImageUri = uri
+            Toast.makeText(this, getString(R.string.image_selected), Toast.LENGTH_SHORT).show()
         }
     }
+
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && capturedImageUri != null) {
+            selectedImageUri = capturedImageUri
+            Toast.makeText(this, getString(R.string.image_taken), Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, getString(R.string.image_capture_failed), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun openCamera() {
+        val imageFile = File.createTempFile("camera_photo", ".jpg", cacheDir).apply {
+            createNewFile()
+            deleteOnExit() // Asegura que el archivo temporal se elimine al salir
+        }
+
+        capturedImageUri = FileProvider.getUriForFile(
+            this,
+            "${packageName}.fileprovider", // Asegúrate de que este authority coincida con tu manifest
+            imageFile
+        )
+
+        capturedImageUri?.let {
+            cameraLauncher.launch(it)
+        } ?: run {
+            Toast.makeText(this, getString(R.string.error_creating_image_file), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showImageSourceDialog() {
+        val options = arrayOf(getString(R.string.take_photo_option), getString(R.string.choose_from_gallery_option))
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.select_image_title))
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> openCamera()
+                    1 -> imagePickerLauncher.launch("image/*")
+                }
+            }
+            .setNegativeButton(getString(R.string.cancel_button), null)
+            .show()
+    }
+
 
     private fun updateDateDisplay() {
         selectedDate?.let { date ->
             val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            tvSelectedDate.text = "Fecha: ${dateFormat.format(date.time)}"
+            tvSelectedDate.text = "${getString(R.string.selected_date_placeholder).split(":")[0]}: ${dateFormat.format(date.time)}"
         }
     }
 
     private fun updateTimeDisplay() {
         selectedTime?.let { time ->
             val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-            tvSelectedTime.text = "Hora: ${timeFormat.format(time.time)}"
+            tvSelectedTime.text = "${getString(R.string.selected_time_placeholder).split(":")[0]}: ${timeFormat.format(time.time)}"
         }
     }
 
@@ -326,19 +378,20 @@ class AddReminderActivity : BaseActivity() {
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
+            .setTitle(getString(R.string.dialog_share_reminder_title))
             .setCancelable(false)
             .create()
 
         btnConfirmShare.setOnClickListener {
             val emailsText = etShareEmails.text.toString().trim()
             if (emailsText.isEmpty()) {
-                Toast.makeText(this, "Por favor, ingresa al menos un correo electrónico.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_empty_emails), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val emails = emailsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
             if (emails.isEmpty()) {
-                Toast.makeText(this, "Correos electrónicos no válidos.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_invalid_emails), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -358,7 +411,7 @@ class AddReminderActivity : BaseActivity() {
                         if (!querySnapshot.isEmpty) {
                             val uid = querySnapshot.documents[0].id
                             if (uid == auth.currentUser?.uid) {
-                                Toast.makeText(this, "No puedes compartir un recordatorio contigo mismo.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, getString(R.string.toast_cannot_share_self), Toast.LENGTH_SHORT).show()
                             } else {
                                 foundUserIds.add(uid)
                                 successfulLookups++
@@ -366,7 +419,7 @@ class AddReminderActivity : BaseActivity() {
                             }
                         } else {
                             Log.w("AddReminderActivity", "User with email $email not found.")
-                            Toast.makeText(this, "Usuario con correo '$email' no encontrado.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, getString(R.string.toast_user_not_found, email), Toast.LENGTH_SHORT).show()
                         }
 
                         if (emailsToProcess == 0) {
@@ -377,23 +430,23 @@ class AddReminderActivity : BaseActivity() {
                             if (successfulLookups > 0) {
                                 sharedWithUserIds.clear()
                                 sharedWithUserIds.addAll(foundUserIds)
-                                Toast.makeText(this, "Se compartirán con ${successfulLookups} usuario(s).", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, getString(R.string.toast_shared_with_users, successfulLookups), Toast.LENGTH_SHORT).show()
                                 dialog.dismiss()
                             } else {
-                                Toast.makeText(this, "No se encontraron usuarios válidos para compartir.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, getString(R.string.toast_no_valid_users_found), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
                     .addOnFailureListener { e ->
                         emailsToProcess--
                         Log.e("AddReminderActivity", "Error looking up user by email: $email, Error: ${e.message}", e)
-                        Toast.makeText(this, "Error al buscar usuario: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.toast_error_fetching_users, e.message), Toast.LENGTH_SHORT).show()
 
                         if (emailsToProcess == 0) {
                             progressBarShare.isVisible = false
                             btnConfirmShare.isEnabled = true
                             btnCancelShare.isEnabled = true
-                            Toast.makeText(this, "Error: No se pudieron buscar todos los usuarios.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, getString(R.string.toast_error_all_users_not_found), Toast.LENGTH_SHORT).show()
                         }
                     }
             }
@@ -406,19 +459,23 @@ class AddReminderActivity : BaseActivity() {
 
     private fun addReminder() {
         val title = etReminderTitle.text.toString().trim()
-        val selectedCategory = spinnerCategory.selectedItem.toString()
-        val selectedType = spinnerType.selectedItem.toString()
+        val selectedCategoryDisplayName = spinnerCategory.selectedItem.toString()
+        val selectedFrequencyDisplayName = spinnerFrequency.selectedItem.toString()
         val userId = auth.currentUser?.uid
         val isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
         val reminderId = if (isEditMode) intent.getStringExtra("REMINDER_ID") else null
 
+        // Convertir nombres de visualización a claves antes de guardar
+        val selectedCategoryKey = ReminderConstants.getCategoryKeyFromDisplayName(this, selectedCategoryDisplayName)
+        val selectedTypeKey = ReminderConstants.getTypeKeyFromDisplayName(this, selectedFrequencyDisplayName)
+
         if (title.isEmpty() || selectedDate == null || selectedTime == null) {
-            Toast.makeText(this, "Por favor, complete todos los campos de recordatorio", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_completing_fields), Toast.LENGTH_SHORT).show()
             return
         }
 
         if (userId == null) {
-            Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_user_not_authenticated), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -443,8 +500,8 @@ class AddReminderActivity : BaseActivity() {
                 userId = userId,
                 title = title,
                 timestamp = reminderCalendar.timeInMillis,
-                type = selectedType,
-                category = selectedCategory,
+                type = selectedTypeKey,
+                category = selectedCategoryKey,
                 sharedWith = sharedWithUserIds,
                 isShared = sharedWithUserIds.isNotEmpty(),
                 originalCreatorId = userId,
@@ -455,35 +512,32 @@ class AddReminderActivity : BaseActivity() {
             )
 
             if (isEditMode && reminderId != null) {
-                // Modo edición - actualizar el recordatorio existente
                 firestore.collection("users").document(userId).collection("reminders")
                     .document(reminderId)
                     .set(reminder.copy(id = reminderId))
                     .addOnSuccessListener {
-                        // Cancelar notificación antigua y programar nueva
                         cancelExistingNotification(reminderId)
                         scheduleReminderNotification(reminder.copy(id = reminderId), reminderId)
 
-                        // Actualizar invitaciones si es un recordatorio compartido
                         if (sharedWithUserIds.isNotEmpty()) {
                             updateSharedReminders(reminderId, reminder)
                         }
 
                         setLoadingState(false)
-                        Toast.makeText(this, "Recordatorio actualizado exitosamente", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.toast_reminder_updated_successfully), Toast.LENGTH_SHORT).show()
                         firebaseAnalytics.logEvent("edit_reminder") {
                             param("user_id", userId)
                             param("reminder_id", reminderId)
                             param("reminder_title", reminder.title)
+                            param("has_image", (!imageUrl.isNullOrEmpty()).toString())
                         }
                         finish()
                     }
                     .addOnFailureListener { e ->
                         setLoadingState(false)
-                        Toast.makeText(this, "Error al actualizar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, getString(R.string.toast_error_updating_reminder, e.message), Toast.LENGTH_LONG).show()
                     }
             } else {
-                // Modo creación - agregar nuevo recordatorio
                 firestore.collection("users").document(userId).collection("reminders")
                     .add(reminder)
                     .addOnSuccessListener { documentReference ->
@@ -512,7 +566,7 @@ class AddReminderActivity : BaseActivity() {
                                 }
 
                                 setLoadingState(false)
-                                Toast.makeText(this, "Recordatorio agregado exitosamente", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, getString(R.string.toast_reminder_added_successfully), Toast.LENGTH_SHORT).show()
                                 clearForm()
                                 firebaseAnalytics.logEvent("add_reminder") {
                                     param("user_id", userId)
@@ -522,17 +576,18 @@ class AddReminderActivity : BaseActivity() {
                                     param("reminder_category", reminder.category)
                                     param("shared_with_count", reminder.sharedWith.size.toLong())
                                     param("has_location", (reminder.latitude != null && reminder.longitude != null).toString())
+                                    param("has_image", (!imageUrl.isNullOrEmpty()).toString())
                                 }
                                 finish()
                             }
                             .addOnFailureListener { e ->
                                 setLoadingState(false)
-                                Toast.makeText(this, "Error al guardar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this, getString(R.string.toast_error_saving_reminder, e.message), Toast.LENGTH_LONG).show()
                             }
                     }
                     .addOnFailureListener { e ->
                         setLoadingState(false)
-                        Toast.makeText(this, "Error al agregar recordatorio: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, getString(R.string.toast_error_adding_reminder, e.message), Toast.LENGTH_LONG).show()
                     }
             }
         }
@@ -548,6 +603,7 @@ class AddReminderActivity : BaseActivity() {
 
             val service = retrofit.create(ImgbbService::class.java)
             val requestBody = RequestBody.create(MultipartBody.FORM, base64Image)
+            // Reemplaza "YOUR_IMGBB_API_KEY" con tu clave real de ImgBB
             val call = service.uploadImage("a22a878e6ccb5e3bcfd0a26cd4f5ac6c", requestBody)
 
             call.enqueue(object : Callback<ImgbbResponse> {
@@ -557,13 +613,15 @@ class AddReminderActivity : BaseActivity() {
                         saveReminderToFirestore(imageUrl)
                     } else {
                         setLoadingState(false)
-                        Toast.makeText(this@AddReminderActivity, "Error al subir imagen", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@AddReminderActivity, getString(R.string.error_uploading_image), Toast.LENGTH_SHORT).show()
+                        Log.e("AddReminderActivity", "ImgBB upload error: ${response.errorBody()?.string()}")
                     }
                 }
 
                 override fun onFailure(call: Call<ImgbbResponse>, t: Throwable) {
                     setLoadingState(false)
-                    Toast.makeText(this@AddReminderActivity, "Fallo al subir imagen", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AddReminderActivity, getString(R.string.image_upload_failed), Toast.LENGTH_SHORT).show()
+                    Log.e("AddReminderActivity", "ImgBB upload failure: ${t.message}", t)
                 }
             })
         } else {
@@ -604,19 +662,22 @@ class AddReminderActivity : BaseActivity() {
             timeInMillis = reminder.timestamp
             add(Calendar.MINUTE, -5)
         }.timeInMillis
+
+        val translatedCategory = ReminderConstants.getCategoryDisplayName(this, reminder.category)
+
         if (notificationTime <= System.currentTimeMillis()) {
             Log.d("AddReminderActivity", "Notification time for ${reminder.title} is in the past or too soon, showing immediately.")
             notificationHelper.showNotification(
-                "Recordatorio: ${reminder.title}",
-                "Tu recordatorio de ${reminder.category} ya pasó o está a punto de vencer.",
+                getString(R.string.notification_title_reminder, reminder.title),
+                getString(R.string.notification_message_past_due, translatedCategory),
                 notificationId
             )
             return
         }
 
         val intent = Intent(this, NotificationPublisher::class.java).apply {
-            putExtra(NotificationPublisher.REMINDER_TITLE_EXTRA, "Recordatorio: ${reminder.title}")
-            putExtra(NotificationPublisher.REMINDER_MESSAGE_EXTRA, "Tu recordatorio de ${reminder.category} está a punto de vencer.")
+            putExtra(NotificationPublisher.REMINDER_TITLE_EXTRA, reminder.title)
+            putExtra(NotificationPublisher.REMINDER_MESSAGE_EXTRA_KEY, reminder.category)
             putExtra(NotificationPublisher.NOTIFICATION_ID_EXTRA, notificationId)
             putExtra(NotificationPublisher.REMINDER_ID_EXTRA, reminderId)
         }
@@ -637,78 +698,42 @@ class AddReminderActivity : BaseActivity() {
             Log.d("AddReminderActivity", "Scheduled notification for ${reminder.title} at ${SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date(notificationTime))}")
         } catch (e: SecurityException) {
             Log.e("AddReminderActivity", "SecurityException al programar alarma: ${e.message}", e)
-            Toast.makeText(this, "No se pudo programar el recordatorio. Por favor, revisa los permisos de alarma de la aplicación.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.error_scheduling_alarm), Toast.LENGTH_LONG).show()
         }
     }
 
     private fun uriToBase64(context: Context, uri: Uri): String {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        val bytes = inputStream?.readBytes()
-        return Base64.encodeToString(bytes, Base64.DEFAULT)
-    }
-
-    private val cameraLauncher = registerForActivityResult(
-        ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success && capturedImageUri != null) {
-            selectedImageUri = capturedImageUri
-        }
-    }
-
-    private fun openCamera() {
-        val imageFile = File.createTempFile("camera_photo", ".jpg", cacheDir).apply {
-            createNewFile()
-            deleteOnExit()
-        }
-
-        capturedImageUri = FileProvider.getUriForFile(
-            this,
-            "${packageName}.fileprovider",
-            imageFile
-        )
-
-        capturedImageUri?.let {
-            cameraLauncher.launch(it)
-        }
-    }
-
-    private fun showImageSourceDialog() {
-        val options = arrayOf("Sacar foto", "Elegir desde la galería")
-
-        AlertDialog.Builder(this)
-            .setTitle("Seleccionar imagen")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> openCamera()
-                    1 -> imagePickerLauncher.launch("image/*")
-                }
-            }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        return context.contentResolver.openInputStream(uri)?.use { inputStream ->
+            val bytes = inputStream.readBytes()
+            Base64.encodeToString(bytes, Base64.DEFAULT)
+        } ?: "" // Devuelve una cadena vacía si no se puede abrir el stream
     }
 
     private fun clearForm() {
         etReminderTitle.text.clear()
         selectedDate = null
         selectedTime = null
-        tvSelectedDate.text = "Fecha: Seleccionar"
-        tvSelectedTime.text = "Hora: Seleccionar"
+        tvSelectedDate.text = "${getString(R.string.selected_date_placeholder).split(":")[0]}: ${getString(R.string.select_text)}"
+        tvSelectedTime.text = "${getString(R.string.selected_time_placeholder).split(":")[0]}: ${getString(R.string.select_text)}"
         spinnerCategory.setSelection(0)
-        spinnerType.setSelection(0)
+        spinnerFrequency.setSelection(0)
         sharedWithUserIds.clear()
         selectedLatitude = null
         selectedLongitude = null
+        selectedImageUri = null // Limpia la URI de la imagen
+        btnSelectImage.text = getString(R.string.select_image_button) // Restablece el texto del botón
     }
 
     private fun setLoadingState(isLoading: Boolean) {
         btnAddReminder.isEnabled = !isLoading
         btnShareReminder.isEnabled = !isLoading
         btnSelectLocation.isEnabled = !isLoading
+        btnSelectImage.isEnabled = !isLoading // Deshabilita/habilita el botón de imagen
         progressBar.isVisible = isLoading
         if (isLoading) {
             btnAddReminder.text = ""
         } else {
-            btnAddReminder.text = "Agregar Recordatorio"
+            btnAddReminder.text = getString(R.string.add_reminder_button)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.memoloop
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,7 +10,6 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -17,9 +17,10 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.logEvent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 
-class WelcomeActivity : BaseActivity() {
+class WelcomeActivity : BaseActivity() { // Asegúrate de que herede de BaseActivity
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     private lateinit var auth: FirebaseAuth
@@ -32,18 +33,29 @@ class WelcomeActivity : BaseActivity() {
     private lateinit var toolbarWelcome: Toolbar
     private lateinit var btnViewInvitationsWelcome: Button
 
+    private val scope = CoroutineScope(Dispatchers.Main + Job()) // CoroutineScope para operaciones asíncronas
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(LanguageManager.updateBaseContextLocale(newBase!!))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_welcome)
+        // Llama a setChildContentView de BaseActivity para inflar tu layout
+        setChildContentView(R.layout.activity_welcome)
 
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
+        initViews()
+
+        // setupBottomNavigationBar() ya se llama desde BaseActivity.onCreate()
+        // No es necesario llamarlo aquí de nuevo si ya está en BaseActivity.
 
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
             param(FirebaseAnalytics.Param.SCREEN_NAME, "WelcomeActivity")
             param(FirebaseAnalytics.Param.SCREEN_CLASS, "WelcomeActivity")
-            param("message", "Pantalla de bienvenida inicializada")
+            param("message", getString(R.string.welcome_screen_initialized_log))
         }
     }
 
@@ -52,90 +64,18 @@ class WelcomeActivity : BaseActivity() {
         checkUserRemindersAndSetupUI()
     }
 
-    private fun checkUserRemindersAndSetupUI() {
-        val userId = auth.currentUser?.uid
-        Log.d("WelcomeActivityDebug", "Current user UID at start: $userId")
-
-        if (userId == null) {
-            Toast.makeText(this, "Sesión no iniciada. Por favor, inicie sesión.", Toast.LENGTH_LONG).show()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-            return
-        }
-
-        firestore.collection("users").document(userId).collection("reminders")
-            .limit(1)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                if (querySnapshot.isEmpty) {
-                    Log.d("WelcomeActivityDebug", "No personal reminders found.")
-                    checkForPendingInvitationsAndSetupWelcomeScreen(userId)
-                } else {
-                    Log.d("WelcomeActivityDebug", "Personal reminders found. Redirecting to RemindersActivity.")
-                    Toast.makeText(this, "Cargando tus recordatorios...", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, RemindersActivity::class.java))
-                    finish()
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("WelcomeActivity", "Error al verificar recordatorios propios: ${e.message}", e)
-                Toast.makeText(this, "Error al cargar recordatorios: ${e.message}", Toast.LENGTH_LONG).show()
-                checkForPendingInvitationsAndSetupWelcomeScreen(userId)
-            }
-    }
-
-    private fun checkForPendingInvitationsAndSetupWelcomeScreen(userId: String) {
-        firestore.collection("users").document(userId).collection("userInvitations")
-            .limit(1)
-            .get()
-            .addOnSuccessListener { invitationSnapshot ->
-                Log.d("WelcomeActivityDebug", "Invitations snapshot empty: ${invitationSnapshot.isEmpty}")
-                if (!invitationSnapshot.isEmpty) {
-                    Log.d("WelcomeActivityDebug", "Invitations found: ${invitationSnapshot.documents.map { it.id }}")
-                }
-
-
-                if (invitationSnapshot.isEmpty) {
-                    Log.d("WelcomeActivity", "No hay recordatorios ni invitaciones. Mostrando pantalla de bienvenida sin recordatorios.")
-                    setupNoRemindersWelcomeScreen(userId, hasInvitations = false)
-                } else {
-                    Log.d("WelcomeActivity", "Tienes invitaciones pendientes. Mostrando pantalla de bienvenida con indicador.")
-                    setupNoRemindersWelcomeScreen(userId, hasInvitations = true)
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("WelcomeActivity", "Error al verificar invitaciones: ${e.message}", e)
-                Toast.makeText(this, "Error al verificar invitaciones: ${e.message}", Toast.LENGTH_LONG).show()
-                setupNoRemindersWelcomeScreen(userId, hasInvitations = false)
-            }
-    }
-
-    private fun setupNoRemindersWelcomeScreen(userId: String, hasInvitations: Boolean) {
-        setContentView(R.layout.activity_welcome_no_reminders)
-
+    private fun initViews() {
         toolbarWelcome = findViewById(R.id.toolbar_welcome_dynamic)
         setSupportActionBar(toolbarWelcome)
+        supportActionBar?.title = getString(R.string.app_name)
 
         tvWelcomeMessage = findViewById(R.id.tv_welcome_message_dynamic)
         tvNoRemindersWelcome = findViewById(R.id.tv_no_reminders_info_dynamic)
         fabAddReminder = findViewById(R.id.fab_add_reminder_dynamic)
         progressBarWelcome = findViewById(R.id.progress_bar_welcome_dynamic)
         btnViewInvitationsWelcome = findViewById(R.id.btn_view_invitations_welcome)
-
-        loadUserName(userId)
-
-        if (hasInvitations) {
-            tvNoRemindersWelcome.text = "¡Tienes invitaciones pendientes! Haz clic para verlas."
-            btnViewInvitationsWelcome.isVisible = true
-            Log.d("WelcomeActivityDebug", "btnViewInvitationsWelcome set to VISIBLE")
-        } else {
-            tvNoRemindersWelcome.text = "No tienes recordatorios. ¡Haz clic en el '+' para agregar uno!"
-            btnViewInvitationsWelcome.isVisible = false
-            Log.d("WelcomeActivityDebug", "btnViewInvitationsWelcome set to GONE")
-        }
-
         fabAddReminder.setOnClickListener {
-            Toast.makeText(this, "Redirigiendo para agregar recordatorios...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_redirecting_add_reminder), Toast.LENGTH_SHORT).show()
             firebaseAnalytics.logEvent("add_reminder_from_welcome_fab") {
                 param("user_id", auth.currentUser?.uid ?: "unknown")
             }
@@ -147,6 +87,84 @@ class WelcomeActivity : BaseActivity() {
         }
     }
 
+    private fun checkUserRemindersAndSetupUI() {
+        val userId = auth.currentUser?.uid
+        Log.d("WelcomeActivityDebug", "Current user UID at start: $userId")
+
+        if (userId == null) {
+            Toast.makeText(this, getString(R.string.toast_session_not_started_login_prompt), Toast.LENGTH_LONG).show()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+        setLoadingState(true)
+
+        scope.launch {
+            try {
+                // Verificar si el usuario tiene recordatorios
+                val reminderSnapshot = firestore.collection("users")
+                    .document(userId)
+                    .collection("reminders")
+                    .limit(1)
+                    .get()
+                    .await()
+                val hasReminders = !reminderSnapshot.isEmpty
+
+                // Verificar invitaciones pendientes
+                val invitationSnapshot = firestore.collection("users")
+                    .document(userId)
+                    .collection("userInvitations")
+                    .limit(1)
+                    .get()
+                    .await()
+                val hasPendingInvitations = !invitationSnapshot.isEmpty // <-- Definición de hasPendingInvitations
+
+                withContext(Dispatchers.Main) {
+                    setLoadingState(false)
+                    if (hasReminders) {
+                        Log.d("WelcomeActivityDebug", "Personal reminders found. Redirecting to RemindersActivity.")
+                        Toast.makeText(this@WelcomeActivity, getString(R.string.toast_loading_reminders), Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this@WelcomeActivity, RemindersActivity::class.java))
+                        finish()
+                    } else {
+                        Log.d("WelcomeActivityDebug", "No personal reminders found.")
+                        // Pasa hasPendingInvitations correctamente aquí
+                        setupNoRemindersWelcomeScreenContent(userId, hasPendingInvitations)
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    setLoadingState(false)
+                    Log.e("WelcomeActivity", getString(R.string.error_checking_personal_reminders_log, e.message), e)
+                    Toast.makeText(this@WelcomeActivity, getString(R.string.error_loading_reminders, e.message), Toast.LENGTH_LONG).show()
+                    // Si hay un error, asumimos que no hay invitaciones para evitar otro error.
+                    setupNoRemindersWelcomeScreenContent(userId, false)
+                }
+            }
+        }
+    }
+
+    // Esta función ya no es necesaria como función separada si toda la lógica
+    // de verificación de recordatorios e invitaciones se maneja en checkUserRemindersAndSetupUI.
+    // Si aún la tienes definida en tu archivo, puedes eliminarla.
+    // private fun checkForPendingInvitationsAndSetupWelcomeScreen(userId: String) { ... }
+
+    private fun setupNoRemindersWelcomeScreenContent(userId: String, hasInvitations: Boolean) {
+        loadUserName(userId)
+
+        if (hasInvitations) {
+            tvNoRemindersWelcome.text = getString(R.string.tv_no_reminders_info_has_invitations)
+            btnViewInvitationsWelcome.isVisible = true
+            Log.d("WelcomeActivityDebug", "btnViewInvitationsWelcome set to VISIBLE")
+        } else {
+            tvNoRemindersWelcome.text = getString(R.string.no_reminders_message)
+            btnViewInvitationsWelcome.isVisible = false
+            Log.d("WelcomeActivityDebug", "btnViewInvitationsWelcome set to GONE")
+        }
+        fabAddReminder.isVisible = true
+        progressBarWelcome.isVisible = false
+    }
+
     private fun loadUserName(userId: String) {
         setLoadingState(true)
         firestore.collection("users").document(userId).get()
@@ -154,22 +172,22 @@ class WelcomeActivity : BaseActivity() {
                 setLoadingState(false)
                 if (document.exists()) {
                     val userName = document.getString("name")
-                    tvWelcomeMessage.text = "Bienvenido ${userName?.trim() ?: ""} a MemoLoop, tu app de recordatorios"
+                    tvWelcomeMessage.text = getString(R.string.welcome_message_placeholder, userName?.trim() ?: "")
                     firebaseAnalytics.logEvent("welcome_message_displayed") {
                         param("user_id", userId)
                         param("user_name", userName ?: "N/A")
                     }
                 } else {
-                    tvWelcomeMessage.text = "Bienvenido a MemoLoop, tu app de recordatorios"
+                    tvWelcomeMessage.text = getString(R.string.welcome_message_fallback)
                     Log.d("WelcomeActivity", "Documento de usuario no encontrado en Firestore para UID: $userId")
-                    Toast.makeText(this, "No se pudo cargar el nombre del usuario", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.toast_error_loading_username), Toast.LENGTH_SHORT).show()
                 }
             }
             .addOnFailureListener { e ->
                 setLoadingState(false)
-                tvWelcomeMessage.text = "Bienvenido a MemoLoop, tu app de recordatorios"
-                Log.e("WelcomeActivity", "Error al cargar datos del usuario desde Firestore", e)
-                Toast.makeText(this, "Error al cargar el nombre: ${e.message}", Toast.LENGTH_LONG).show()
+                tvWelcomeMessage.text = getString(R.string.welcome_message_fallback)
+                Log.e("WelcomeActivity", getString(R.string.error_loading_user_data_firestore_log, e.message), e)
+                Toast.makeText(this, getString(R.string.toast_error_loading_name, e.message), Toast.LENGTH_LONG).show()
             }
     }
 
@@ -200,7 +218,7 @@ class WelcomeActivity : BaseActivity() {
 
     private fun logout() {
         auth.signOut()
-        Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.toast_session_closed), Toast.LENGTH_SHORT).show()
 
         firebaseAnalytics.logEvent("logout_from_welcome") {
             param("user_email", auth.currentUser?.email ?: "unknown")
@@ -208,5 +226,10 @@ class WelcomeActivity : BaseActivity() {
 
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.cancel() // Cancela todas las coroutines en este scope
     }
 }

@@ -1,5 +1,6 @@
 package com.example.memoloop
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,14 +10,14 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity // Ya no se usa directamente, ahora se hereda de BaseActivity
 import androidx.core.view.isVisible
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.logEvent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : BaseActivity() {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     private lateinit var auth: FirebaseAuth
@@ -29,6 +30,10 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var btnRegister: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var tvLogin: TextView
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(LanguageManager.updateBaseContextLocale(newBase!!))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,17 +74,17 @@ class RegisterActivity : AppCompatActivity() {
         val password = etPassword.text.toString().trim()
 
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_completing_fields_register), Toast.LENGTH_SHORT).show()
             return
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(this, "Correo electrónico inválido", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_invalid_email), Toast.LENGTH_SHORT).show()
             return
         }
 
         if (password.length < 6) {
-            Toast.makeText(this, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_password_length), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -99,7 +104,8 @@ class RegisterActivity : AppCompatActivity() {
                         firestore.collection("users").document(userId).set(user)
                             .addOnSuccessListener {
                                 setLoadingState(false)
-                                Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                                // Usar cadena de recurso
+                                Toast.makeText(this, getString(R.string.toast_register_success), Toast.LENGTH_SHORT).show()
 
                                 firebaseAnalytics.logEvent("register_success") {
                                     param("user_email", email)
@@ -110,13 +116,13 @@ class RegisterActivity : AppCompatActivity() {
                             }
                             .addOnFailureListener { e ->
                                 setLoadingState(false)
-                                Toast.makeText(this, "Error guardando datos: ${e.message}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this, getString(R.string.error_saving_user_data, e.message), Toast.LENGTH_LONG).show()
                                 Log.e("RegisterActivity", "Error guardando datos de usuario", e)
                             }
                     }
                 } else {
                     setLoadingState(false)
-                    Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.error_register_failed, task.exception?.message), Toast.LENGTH_LONG).show()
                     Log.e("RegisterActivity", "Error de registro", task.exception)
                 }
             }
@@ -128,7 +134,7 @@ class RegisterActivity : AppCompatActivity() {
         if (isLoading) {
             btnRegister.text = ""
         } else {
-            btnRegister.text = "Registrarse"
+            btnRegister.text = getString(R.string.register_button_text)
         }
     }
 }

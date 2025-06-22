@@ -9,7 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity // Ya no se usa directamente, ahora se hereda de BaseActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
@@ -42,6 +42,7 @@ class ReminderDetailActivity : BaseActivity() {
     private lateinit var cardMapReminder: CardView
     private lateinit var imgReminder: PhotoView
     private lateinit var btnDownloadImage: ImageButton
+
     private lateinit var mapView: MapView
 
     private lateinit var btnEdit: Button
@@ -50,10 +51,15 @@ class ReminderDetailActivity : BaseActivity() {
     private var reminderId: String? = null
     private var reminderData: Reminder? = null
 
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(LanguageManager.updateBaseContextLocale(newBase!!))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MapLibre.getInstance(this)
         setContentView(R.layout.activity_reminder_detail)
+
 
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
@@ -80,6 +86,7 @@ class ReminderDetailActivity : BaseActivity() {
 
         mapView.onCreate(null)
     }
+
     private fun getColorByType(context: Context, type: String): Int {
         val typeLower = type.lowercase()
         val colorRes = when (typeLower) {
@@ -90,17 +97,15 @@ class ReminderDetailActivity : BaseActivity() {
             "general" -> R.color.reminder_category_general
             else -> R.color.reminder_category_general
         }
-        return context.getColor(colorRes) // si estás en API 23+
-        // return ContextCompat.getColor(context, colorRes) // si necesitas compatibilidad
+        return ContextCompat.getColor(context, colorRes)
     }
-
 
     private fun loadReminder() {
         reminderId = intent.getStringExtra("REMINDER_ID")
         val userId = auth.currentUser?.uid
 
         if (userId == null || reminderId == null) {
-            Toast.makeText(this, "Error al cargar el recordatorio", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_loading_reminder_detail), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -115,12 +120,12 @@ class ReminderDetailActivity : BaseActivity() {
                     reminderData = doc.toObject(Reminder::class.java)
                     reminderData?.let { displayReminder(it) }
                 } else {
-                    Toast.makeText(this, "Recordatorio no encontrado", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.toast_reminder_not_found), Toast.LENGTH_SHORT).show()
                     finish()
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Error al obtener el recordatorio", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_fetching_reminder_detail), Toast.LENGTH_SHORT).show()
                 finish()
             }
     }
@@ -132,8 +137,8 @@ class ReminderDetailActivity : BaseActivity() {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-        tvDate.text = dateFormat.format(date)
-        tvTime.text = timeFormat.format(date)
+        tvDate.text = getString(R.string.detail_date_placeholder).split(":")[0] + ": ${dateFormat.format(date)}"
+        tvTime.text = getString(R.string.detail_time_placeholder).split(":")[0] + ": ${timeFormat.format(date)}"
         tvFrequency.text = reminder.type
         tvType.text = reminder.category
 
@@ -145,10 +150,11 @@ class ReminderDetailActivity : BaseActivity() {
                 .into(imgReminder)
             btnDownloadImage.visibility = View.VISIBLE
             btnDownloadImage.setOnClickListener {
-                downloadImage(this, url)
+                downloadImage(this, url, reminder.title)
             }
         } else {
             cardImgReminder.visibility = View.GONE
+            btnDownloadImage.visibility = View.GONE
         }
 
         if (reminder.latitude != null && reminder.longitude != null) {
@@ -178,10 +184,12 @@ class ReminderDetailActivity : BaseActivity() {
                     mapLibreMap.addMarker(
                         MarkerOptions()
                             .position(location)
-                            .title("Ubicación guardada")
+                            .title(getString(R.string.map_location_title))
                     )
                 }
             }
+        } else {
+            cardMapReminder.visibility = View.GONE
         }
 
         cardView.setCardBackgroundColor(getColorByType(this, reminder.category))
@@ -208,10 +216,10 @@ class ReminderDetailActivity : BaseActivity() {
 
         btnDelete.setOnClickListener {
             AlertDialog.Builder(this)
-                .setTitle("Eliminar recordatorio")
-                .setMessage("¿Estás seguro de que deseas eliminar este recordatorio?")
-                .setPositiveButton("Eliminar") { _, _ -> deleteReminder() }
-                .setNegativeButton("Cancelar", null)
+                .setTitle(getString(R.string.delete_reminder_title_dialog))
+                .setMessage(getString(R.string.delete_reminder_confirmation_detail))
+                .setPositiveButton(getString(R.string.yes_delete_button_short)) { _, _ -> deleteReminder() } // Reutilizar 'yes_delete_button_short'
+                .setNegativeButton(getString(R.string.no_cancel_button), null)
                 .show()
         }
     }
@@ -226,28 +234,27 @@ class ReminderDetailActivity : BaseActivity() {
             .document(id)
             .delete()
             .addOnSuccessListener {
-                Toast.makeText(this, "Recordatorio eliminado", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_reminder_deleted), Toast.LENGTH_SHORT).show()
                 finish()
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Error al eliminar el recordatorio", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_deleting_reminder_detail), Toast.LENGTH_SHORT).show()
             }
     }
 
-    //Auxiliares
-    private fun downloadImage(context: Context, imageUrl: String) {
+    private fun downloadImage(context: Context, imageUrl: String, reminderTitle: String) {
+        val fileName = "${reminderTitle.replace("[^a-zA-Z0-9.-]".toRegex(), "_")}.jpg"
         val request = DownloadManager.Request(Uri.parse(imageUrl))
-            .setTitle("imagen_recordatorio.jpg")
-            .setDescription("Descargando imagen del recordatorio...")
+            .setTitle(getString(R.string.download_image_title, fileName))
+            .setDescription(getString(R.string.download_image_description))
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "imagen_recordatorio.jpg")
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
             .setAllowedOverMetered(true)
             .setAllowedOverRoaming(true)
 
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         downloadManager.enqueue(request)
-
-        Toast.makeText(context, "Descarga iniciada", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, getString(R.string.toast_download_started), Toast.LENGTH_SHORT).show()
     }
 
     override fun onStart() {

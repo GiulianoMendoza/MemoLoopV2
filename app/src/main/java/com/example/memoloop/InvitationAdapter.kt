@@ -43,8 +43,10 @@ class InvitationAdapter(
 
     override fun onBindViewHolder(holder: InvitationViewHolder, position: Int) {
         val invitation = invitations[position]
-        holder.tvTitle.text = "Invitación: ${invitation.reminderTitle}"
-        holder.tvSender.text = "De: ${invitation.sharedFromUserName}"
+        val context = holder.itemView.context
+
+        holder.tvTitle.text = context.getString(R.string.invitation_title_with_name, invitation.reminderTitle)
+        holder.tvSender.text = context.getString(R.string.invitation_sender_with_name, invitation.sharedFromUserName)
 
         holder.btnAccept.setOnClickListener { listener.onAcceptClick(invitation) }
         holder.btnReject.setOnClickListener { listener.onRejectClick(invitation) }

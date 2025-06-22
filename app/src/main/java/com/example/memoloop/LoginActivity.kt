@@ -1,5 +1,6 @@
 package com.example.memoloop
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -8,14 +9,14 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity // Ya no se usa directamente, ahora se hereda de BaseActivity
 import androidx.core.view.isVisible
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.logEvent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     private lateinit var auth: FirebaseAuth
@@ -27,6 +28,10 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var tvRegister: TextView
 
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(LanguageManager.updateBaseContextLocale(newBase!!))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -34,8 +39,6 @@ class LoginActivity : AppCompatActivity() {
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
-
-        // Inicializar vistas
         initViews()
         setupClickListeners()
     }
@@ -63,7 +66,7 @@ class LoginActivity : AppCompatActivity() {
         val password = etPassword.text.toString().trim()
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_completing_fields_login), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -73,7 +76,7 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener { task ->
                 setLoadingState(false)
                 if (task.isSuccessful) {
-                    Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.toast_login_success), Toast.LENGTH_SHORT).show()
 
                     firebaseAnalytics.logEvent("login_success") {
                         param("user_email", email)
@@ -82,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
                     startActivity(Intent(this, WelcomeActivity::class.java))
                     finish()
                 } else {
-                    Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.error_login_failed, task.exception?.message), Toast.LENGTH_LONG).show()
                     Log.e("LoginActivity", "Error de inicio de sesión", task.exception)
                 }
             }
@@ -94,7 +97,7 @@ class LoginActivity : AppCompatActivity() {
         if (isLoading) {
             btnLogin.text = ""
         } else {
-            btnLogin.text = "Iniciar Sesión"
+            btnLogin.text = getString(R.string.login_button_text)
         }
     }
 }

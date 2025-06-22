@@ -1,11 +1,11 @@
 package com.example.memoloop
 
 import android.content.Intent
-import android.util.Log
+import android.util.Log // Se mantiene el import de Log para depuración
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
+import android.widget.ImageButton // Se importa ImageButton para el botón de opciones
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
@@ -29,6 +29,7 @@ class RemindersAdapter(
     class ReminderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: CardView = itemView.findViewById(R.id.card_reminder)
         val tvTitle: TextView = itemView.findViewById(R.id.tv_reminder_title)
+
         val ivCategoryIcon: ImageView = itemView.findViewById(R.id.iv_category_icon)
         val ivTypeIcon: ImageView = itemView.findViewById(R.id.iv_type_icon)
         val tvDate: TextView = itemView.findViewById(R.id.tv_reminder_date)
@@ -45,14 +46,13 @@ class RemindersAdapter(
             .inflate(R.layout.item_reminder, parent, false)
         return ReminderViewHolder(view)
     }
-
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         val reminder = reminders[position]
         val context = holder.itemView.context
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
         if (reminder.isShared && reminder.userId != currentUserId) {
-            holder.tvTitle.text = "Evento con: ${reminder.sharedFromUserName}"
+            holder.tvTitle.text = context.getString(R.string.event_with_user, reminder.sharedFromUserName)
         } else {
             holder.tvTitle.text = reminder.title
         }
@@ -62,38 +62,43 @@ class RemindersAdapter(
 
         holder.tvDate.text = dateFormat.format(calendar.time)
         holder.tvTime.text = timeFormat.format(calendar.time)
-
         val categoryLower = reminder.category.lowercase(Locale.getDefault())
 
         val colorRes = when (categoryLower) {
-            "salud" -> R.color.reminder_category_salud
-            "deporte" -> R.color.reminder_category_deporte
-            "ocio" -> R.color.reminder_category_ocio
-            "estudio" -> R.color.reminder_category_estudio
-            "general" -> R.color.reminder_category_general
+            context.getString(R.string.reminder_category_salud_raw).lowercase(Locale.getDefault()) -> R.color.reminder_category_salud
+            context.getString(R.string.reminder_category_deporte_raw).lowercase(Locale.getDefault()) -> R.color.reminder_category_deporte
+            context.getString(R.string.reminder_category_ocio_raw).lowercase(Locale.getDefault()) -> R.color.reminder_category_ocio
+            context.getString(R.string.reminder_category_estudio_raw).lowercase(Locale.getDefault()) -> R.color.reminder_category_estudio
+            context.getString(R.string.reminder_category_general_raw).lowercase(Locale.getDefault()) -> R.color.reminder_category_general
             else -> R.color.reminder_category_general
         }
         holder.cardView.setCardBackgroundColor(context.getColor(colorRes))
 
         val iconCategoryRes = when (categoryLower) {
-            "salud" -> R.drawable.ic_category_salud
-            "deporte" -> R.drawable.ic_category_deporte
-            "ocio" -> R.drawable.ic_category_ocio
-            "estudio" -> R.drawable.ic_category_estudio
-            "general" -> R.drawable.ic_category_general
+            context.getString(R.string.reminder_category_salud_raw).lowercase(Locale.getDefault()) -> R.drawable.ic_category_salud
+            context.getString(R.string.reminder_category_deporte_raw).lowercase(Locale.getDefault()) -> R.drawable.ic_category_deporte
+            context.getString(R.string.reminder_category_ocio_raw).lowercase(Locale.getDefault()) -> R.drawable.ic_category_ocio
+            context.getString(R.string.reminder_category_estudio_raw).lowercase(Locale.getDefault()) -> R.drawable.ic_category_estudio
+            context.getString(R.string.reminder_category_general_raw).lowercase(Locale.getDefault()) -> R.drawable.ic_category_general
             else -> R.drawable.ic_category_general
         }
         holder.ivCategoryIcon.setImageResource(iconCategoryRes)
+
         val iconTypeRes = when (reminder.type) {
-            "Eventual" -> R.drawable.ic_access_time
-            "Diario", "Semanal", "Mensual", "Anual" -> R.drawable.ic_date_range
+            context.getString(R.string.reminder_type_occasional) -> R.drawable.ic_access_time
+            context.getString(R.string.reminder_type_fixed),
+            context.getString(R.string.reminder_type_daily),
+            context.getString(R.string.reminder_type_weekly),
+            context.getString(R.string.reminder_type_monthly),
+            context.getString(R.string.reminder_type_annual) -> R.drawable.ic_date_range
             else -> R.drawable.ic_date_range
         }
         holder.ivTypeIcon.setImageResource(iconTypeRes)
-        holder.tvTypeLabel.text = "FRECUENCIA"
+
+        holder.tvTypeLabel.text = context.getString(R.string.frequency_label_short)
         holder.tvType.text = reminder.type.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 
-        holder.tvCategoryLabel.text = "CATEGORÍA"
+        holder.tvCategoryLabel.text = context.getString(R.string.category_label_short)
         holder.tvCategory.text = reminder.category.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 
         if (reminder.isShared && reminder.userId != currentUserId) {
@@ -122,7 +127,6 @@ class RemindersAdapter(
             context.startActivity(intent)
         }
     }
-
     private fun fetchSharedUserNames(sharedUserIds: List<String>, textView: TextView) {
         if (sharedUserIds.isEmpty()) {
             textView.visibility = View.GONE
@@ -131,8 +135,9 @@ class RemindersAdapter(
 
         val names = mutableListOf<String>()
         var count = 0
+        val context = textView.context
 
-        textView.text = "Compartido con: Cargando..."
+        textView.text = context.getString(R.string.shared_with_loading)
         textView.visibility = View.VISIBLE
 
         sharedUserIds.forEach { userId ->
@@ -145,9 +150,9 @@ class RemindersAdapter(
                     }
                     if (count == sharedUserIds.size) {
                         if (names.isNotEmpty()) {
-                            textView.text = "Compartido con: ${names.joinToString(", ")}"
+                            textView.text = context.getString(R.string.shared_with_users, names.joinToString(", "))
                         } else {
-                            textView.text = "Compartido con: Usuarios no encontrados"
+                            textView.text = context.getString(R.string.shared_with_users_not_found)
                         }
                     }
                 }
@@ -156,14 +161,13 @@ class RemindersAdapter(
                     Log.e("RemindersAdapter", "Error fetching user name for ID $userId: ${e.message}", e)
                     if (count == sharedUserIds.size) {
                         if (names.isNotEmpty()) {
-                            textView.text = "Compartido con: ${names.joinToString(", ")} (algunos errores)"
+                            textView.text = context.getString(R.string.shared_with_some_errors, names.joinToString(", "))
                         } else {
-                            textView.text = "Compartido con: Error al cargar usuarios"
+                            textView.text = context.getString(R.string.shared_with_error_loading)
                         }
                     }
                 }
         }
     }
-
     override fun getItemCount(): Int = reminders.size
 }

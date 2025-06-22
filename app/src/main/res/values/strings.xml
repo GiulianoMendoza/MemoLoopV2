@@ -16,6 +16,7 @@
 
     <string name="menu_logout">Cerrar Sesión</string>
     <string name="my_reminders_toolbar_title">Mis Recordatorios</string>
+    <string name="my_history_toolbar_title">Mi historial</string>
     <string name="no_reminders_message">No hay recordatorios. ¡Haz clic en el + para agregar uno!</string>
     <string name="filter_applied_toast">Filtros aplicados</string>
     <string name="view_invitations_button">Ver Invitaciones</string>
@@ -170,6 +171,7 @@
     <string name="error_loading_reminder_detail">Error al cargar el recordatorio</string>
     <string name="toast_reminder_not_found">Recordatorio no encontrado</string>
     <string name="error_fetching_reminder_detail">Error al obtener el recordatorio</string>
+    <string name="no_past_reminders">No hay recordatorios pasados.</string>
     <string name="map_location_title">Ubicación guardada</string>
     <string name="delete_reminder_title_dialog">Eliminar recordatorio</string>
     <string name="delete_reminder_confirmation_detail">¿Estás seguro de que deseas eliminar este recordatorio?</string>

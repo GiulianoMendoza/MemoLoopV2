@@ -17,6 +17,7 @@
 
     <string name="menu_logout">Log Out</string>
     <string name="my_reminders_toolbar_title">My Reminders</string>
+    <string name="my_history_toolbar_title">My History</string>
     <string name="no_reminders_message">No reminders. Click on the + to add one!</string>
     <string name="filter_applied_toast">Filters applied</string>
     <string name="view_invitations_button">View Invitations</string>
@@ -138,6 +139,8 @@
     <string name="image_selected">Selected image.</string>
     <string name="image_taken">Photo taken successfully.</string>
     <string name="image_capture_failed">Failed to capture image.</string>
+    <string name="no_past_reminders">No past reminders found.</string>
+
     <string name="error_creating_image_file">Error creating temporary image file.</string>
     <string name="take_photo_option">Take photo</string>
     <string name="choose_from_gallery_option">Choose from gallery</string>

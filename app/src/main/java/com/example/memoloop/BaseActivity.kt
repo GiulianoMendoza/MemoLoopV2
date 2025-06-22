@@ -48,7 +48,12 @@ abstract class BaseActivity : AppCompatActivity() {
         }
 
         btnHistory.setOnClickListener {
+            startActivity(Intent(this, HistoryActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            })
+            overridePendingTransition(0, 0)
         }
+
 
         btnLanguageSwitcher.setOnClickListener {
             toggleLanguage()

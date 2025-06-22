@@ -104,7 +104,6 @@ class RegisterActivity : BaseActivity() {
                         firestore.collection("users").document(userId).set(user)
                             .addOnSuccessListener {
                                 setLoadingState(false)
-                                // Usar cadena de recurso
                                 Toast.makeText(this, getString(R.string.toast_register_success), Toast.LENGTH_SHORT).show()
 
                                 firebaseAnalytics.logEvent("register_success") {

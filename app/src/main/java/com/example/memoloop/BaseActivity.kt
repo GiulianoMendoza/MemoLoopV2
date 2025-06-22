@@ -19,48 +19,23 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // BaseActivity SIEMPRE establecerá su propio layout principal (activity_base.xml)
-        // que contiene la barra inferior y un FrameLayout para el contenido de las actividades hijas.
         setContentView(R.layout.activity_base)
-
-        // Configura la barra de navegación inferior, sus elementos ya están disponibles
-        // porque activity_base.xml ha sido establecido.
         setupBottomNavigationBar()
     }
-
-    /**
-     * Este método es el que las actividades que heredan de BaseActivity deben llamar
-     * en su onCreate() para inflar su layout específico DENTRO del FrameLayout
-     * de activity_base.xml.
-     * @param layoutResId El ID del recurso de layout XML de la actividad hija (ej. R.layout.activity_welcome).
-     */
     protected fun setChildContentView(layoutResId: Int) {
-        // Encuentra el FrameLayout en el layout base (activity_base.xml)
-        // Este es el contenedor donde se insertará el contenido de la actividad hija.
         val contentFrame = findViewById<FrameLayout>(R.id.content_frame)
-
-        // Verifica que el FrameLayout existe para evitar NullPointerException
         if (contentFrame != null) {
-            // Infla el layout de la actividad hija dentro del FrameLayout.
-            // El tercer parámetro 'true' significa que el layout inflado debe ser
-            // adjuntado al 'contentFrame' inmediatamente.
             LayoutInflater.from(this).inflate(layoutResId, contentFrame, true)
         } else {
-            // Si llegamos aquí, significa que activity_base.xml NO tiene un FrameLayout
-            // con el ID 'content_frame', lo cual es un error en el layout base.
             throw IllegalStateException("FrameLayout con ID 'content_frame' no encontrado en activity_base.xml. Por favor, verifica tu archivo XML.")
         }
     }
 
     protected fun setupBottomNavigationBar() {
-        // Los IDs de los botones DEBEN existir en R.layout.activity_base
-        // Si alguno de estos findViewById devuelve null, el error es en activity_base.xml
         val btnHome: ImageButton = findViewById(R.id.btn_home)
         val btnHistory: ImageButton = findViewById(R.id.btn_history)
         val btnLanguageSwitcher: Button = findViewById(R.id.btn_language_switcher)
         val btnConfig: ImageButton = findViewById(R.id.btn_config)
-
-        // Establecer el texto inicial del botón de idioma
         updateLanguageButtonText(btnLanguageSwitcher)
 
         btnHome.setOnClickListener {
@@ -73,8 +48,6 @@ abstract class BaseActivity : AppCompatActivity() {
         }
 
         btnHistory.setOnClickListener {
-            // Implementa tu lógica de navegación a la pantalla de historial
-            // Toast.makeText(this, "Funcionalidad de historial", Toast.LENGTH_SHORT).show()
         }
 
         btnLanguageSwitcher.setOnClickListener {
@@ -82,8 +55,6 @@ abstract class BaseActivity : AppCompatActivity() {
         }
 
         btnConfig.setOnClickListener {
-            // Implementa tu lógica de navegación a la pantalla de configuración o logout
-            // Toast.makeText(this, "Funcionalidad de configuración/cerrar sesión", Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -33,7 +33,6 @@ import com.google.firebase.firestore.SetOptions
 import java.text.SimpleDateFormat
 import java.util.*
 
-// Modificado para heredar de BaseActivity
 class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClickListener {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
@@ -53,30 +52,24 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
     private val reminders = mutableListOf<Reminder>()
     private lateinit var remindersAdapter: RemindersAdapter
 
-    // Inicializar con cadenas de recurso
     private var currentFilterCategory: String = ""
     private var currentFilterFrequency: String = ""
-    private var currentUserName: String = "" // Variable para almacenar el nombre del usuario actual
+    private var currentUserName: String = ""
 
     private val REQUEST_NOTIFICATION_PERMISSIONS_REMINDERS = 101
 
-    // Sobrescribir attachBaseContext para aplicar el idioma antes de crear la actividad
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(LanguageManager.updateBaseContextLocale(newBase!!))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Inflar el layout específico de RemindersActivity en el FrameLayout del layout base
-        val contentFrame = findViewById<FrameLayout>(R.id.content_frame) // Obtener el FrameLayout del layout base
-        LayoutInflater.from(this).inflate(R.layout.activity_reminders_list, contentFrame, true) // Inflar el contenido
+        val contentFrame = findViewById<FrameLayout>(R.id.content_frame)
+        LayoutInflater.from(this).inflate(R.layout.activity_reminders_list, contentFrame, true)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar_main)
         setSupportActionBar(toolbar)
-        // Usar cadena de recurso para el título del toolbar
         supportActionBar?.title = getString(R.string.my_reminders_toolbar_title)
-
-        // Inicializar filtros con los valores por defecto del string-array
         currentFilterCategory = getString(R.string.all_categories_filter)
         currentFilterFrequency = getString(R.string.all_frequencies_filter)
 
@@ -86,13 +79,12 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
         firestore = FirebaseFirestore.getInstance()
         notificationHelper = NotificationHelper(this)
 
-        loadCurrentUserName() // Cargar el nombre del usuario actual
+        loadCurrentUserName()
 
         initViews()
         setupClickListeners()
         setupRecyclerView()
         setupFilterSpinners()
-        // setupBottomNavigationBar() -- ¡YA NO SE LLAMA AQUÍ! Lo llama BaseActivity.onCreate()
     }
 
     override fun onResume() {
@@ -102,7 +94,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
     }
 
     private fun initViews() {
-        // Asegúrate de que estos IDs existan en activity_reminders_list.xml
         rvReminders = findViewById(R.id.rv_reminders)
         tvNoReminders = findViewById(R.id.tv_no_reminders)
         fabGoToAddReminder = findViewById(R.id.fab_go_to_add_reminder)
@@ -122,7 +113,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
             currentFilterCategory = spinnerFilterCategory.selectedItem.toString()
             currentFilterFrequency = spinnerFilterFrequency.selectedItem.toString()
             loadReminders()
-            // Usar cadena de recurso
             Toast.makeText(this, getString(R.string.filter_applied_toast), Toast.LENGTH_SHORT).show()
         }
 
@@ -140,25 +130,19 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
     }
 
     private fun setupFilterSpinners() {
-        // Configurar el spinner de categoría
-        val categories = resources.getStringArray(R.array.reminder_categories) // Usar el array de categorías traducido
+        val categories = resources.getStringArray(R.array.reminder_categories)
         val categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerFilterCategory.adapter = categoryAdapter
-        // Seleccionar la categoría actual basándose en la traducción
         spinnerFilterCategory.setSelection(categories.indexOf(currentFilterCategory))
 
-
-        // Configurar el spinner de frecuencia
-        val frequencies = resources.getStringArray(R.array.reminder_frequencies) // Usar el array de frecuencias traducido
+        val frequencies = resources.getStringArray(R.array.reminder_frequencies)
         val frequencyAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, frequencies)
         frequencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerFilterFrequency.adapter = frequencyAdapter
-        // Seleccionar la frecuencia actual basándose en la traducción
         spinnerFilterFrequency.setSelection(frequencies.indexOf(currentFilterFrequency))
     }
 
-    // Carga el nombre del usuario actual desde Firestore
     private fun loadCurrentUserName() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
@@ -176,7 +160,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
     private fun loadReminders() {
         val userId = auth.currentUser?.uid ?: run {
             Log.e("RemindersActivity", "User not authenticated when loading reminders.")
-            // Usar cadena de recurso
             Toast.makeText(this, getString(R.string.error_user_not_authenticated), Toast.LENGTH_LONG).show()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
@@ -191,11 +174,9 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
             .get()
             .addOnSuccessListener { userSnapshot ->
                 for (doc in userSnapshot.documents) {
-                    // Mapear a la nueva clase Reminder con typeKey y categoryKey
                     val reminder = doc.toObject(Reminder::class.java)?.copy(id = doc.id)
                     if (reminder != null) {
                         allFetchedReminders.add(reminder)
-                        // Lógica para eliminar recordatorios eventuales pasados
                         if (reminder.type == ReminderConstants.TYPE_OCCASIONAL_KEY && reminder.timestamp < currentTime) {
                             remindersToDelete.add(reminder.id)
                         }
@@ -205,7 +186,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
             }
             .addOnFailureListener { e ->
                 Log.e("RemindersActivity", "Error al cargar recordatorios propios/aceptados: ${e.message}", e)
-                // Usar cadena de recurso
                 Toast.makeText(this, getString(R.string.error_loading_reminders, e.message), Toast.LENGTH_SHORT).show()
                 updateEmptyState()
             }
@@ -230,7 +210,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
         val filteredReminders = fetchedReminders
             .filter { reminder -> !remindersToDelete.contains(reminder.id) }
             .filter { reminder ->
-                // Usar las cadenas de recurso traducidas para las comparaciones de filtro
                 (currentFilterCategory == getString(R.string.all_categories_filter) ||
                         ReminderConstants.getCategoryDisplayName(this, reminder.category) == currentFilterCategory) &&
                         (currentFilterFrequency == getString(R.string.all_frequencies_filter) ||
@@ -254,7 +233,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
 
 
     private fun updateEmptyState() {
-        // Usar cadenas de recurso para las comparaciones de filtro
         if (reminders.isEmpty()) {
             if (currentFilterCategory == getString(R.string.all_categories_filter) &&
                 currentFilterFrequency == getString(R.string.all_frequencies_filter)) {
@@ -264,13 +242,11 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
             } else {
                 rvReminders.isVisible = false
                 tvNoReminders.isVisible = true
-                // Usar cadena de recurso
                 tvNoReminders.text = getString(R.string.no_reminders_filter_match)
             }
         } else {
             rvReminders.isVisible = true
             tvNoReminders.isVisible = false
-            // Usar cadena de recurso
             tvNoReminders.text = getString(R.string.no_reminders_message)
         }
     }
@@ -293,11 +269,9 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
 
                 if (snapshot.isEmpty) {
                     btnViewInvitations.isVisible = false
-                    // Usar cadena de recurso
                     Log.d("RemindersActivity", getString(R.string.no_pending_invitations))
                 } else {
                     btnViewInvitations.isVisible = true
-                    // Usar cadena de recurso
                     Log.d("RemindersActivity", getString(R.string.pending_invitations_found))
                 }
             }
@@ -325,7 +299,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
 
     private fun logout() {
         auth.signOut()
-        // Usar cadena de recurso
         Toast.makeText(this, getString(R.string.toast_session_closed), Toast.LENGTH_SHORT).show()
 
         firebaseAnalytics.logEvent("logout") {
@@ -341,15 +314,13 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
         popupMenu.menuInflater.inflate(R.menu.menu_card_options, popupMenu.menu)
 
         val currentUserId = auth.currentUser?.uid
-        // Solo permite editar o eliminar si el recordatorio fue creado por el usuario actual
-        // Compartir solo si es el creador original o si no se ha establecido un creador original (para recordatorios más antiguos)
         val canShare = reminder.originalCreatorId.isEmpty() || reminder.originalCreatorId == currentUserId
 
         if (reminder.userId != currentUserId) {
             popupMenu.menu.findItem(R.id.action_edit)?.isVisible = false
             popupMenu.menu.findItem(R.id.action_delete)?.isVisible = false
         }
-        popupMenu.menu.findItem(R.id.action_share)?.isVisible = canShare // Ocultar compartir si no es el creador
+        popupMenu.menu.findItem(R.id.action_share)?.isVisible = canShare
 
         popupMenu.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -358,7 +329,7 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
                     true
                 }
                 R.id.action_share -> {
-                    showShareReminderDialog(reminder) // Llamar a la nueva función de compartir
+                    showShareReminderDialog(reminder)
                     true
                 }
                 R.id.action_delete -> {
@@ -392,8 +363,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
 
         val categories = resources.getStringArray(R.array.reminder_categories).toList()
         val frequencies = resources.getStringArray(R.array.reminder_frequencies).toList()
-
-        // Configurar adaptadores para los spinners en el diálogo de edición
         val categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerEditCategory.adapter = categoryAdapter
@@ -401,14 +370,11 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
         val frequencyAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, frequencies)
         frequencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerEditFrequency.adapter = frequencyAdapter
-
-        // Establecer la selección inicial basándose en la clave y el idioma actual
         spinnerEditCategory.setSelection(categories.indexOf(ReminderConstants.getCategoryDisplayName(this, reminder.category)))
         spinnerEditFrequency.setSelection(frequencies.indexOf(ReminderConstants.getTypeDisplayName(this, reminder.type)))
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
-            // Usar cadena de recurso
             .setTitle(getString(R.string.dialog_edit_reminder_title))
             .setCancelable(false)
             .create()
@@ -454,14 +420,11 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
             val newTitle = etEditTitle.text.toString().trim()
             val newCategoryDisplayName = spinnerEditCategory.selectedItem.toString()
             val newFrequencyDisplayName = spinnerEditFrequency.selectedItem.toString()
-
-            // Convertir nombres de visualización a claves antes de guardar
             val newCategoryKey = ReminderConstants.getCategoryKeyFromDisplayName(this, newCategoryDisplayName)
             val newTypeKey = ReminderConstants.getTypeKeyFromDisplayName(this, newFrequencyDisplayName)
 
 
             if (newTitle.isEmpty()) {
-                // Usar cadena de recurso
                 Toast.makeText(this, getString(R.string.error_title_empty), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -479,8 +442,8 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
             val updatedReminderMap = hashMapOf(
                 "title" to newTitle,
                 "timestamp" to updatedTimestampCalendar.timeInMillis,
-                "typeKey" to newTypeKey, // Guardar la clave
-                "categoryKey" to newCategoryKey // Guardar la clave
+                "typeKey" to newTypeKey,
+                "categoryKey" to newCategoryKey
             )
 
             progressBarEdit.visibility = View.VISIBLE
@@ -490,7 +453,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
                 .document(reminder.id)
                 .update(updatedReminderMap as Map<String, Any>)
                 .addOnSuccessListener {
-                    // Usar cadena de recurso
                     Toast.makeText(this, getString(R.string.toast_update_reminder_success), Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
                     cancelReminderNotification(reminder.id)
@@ -519,7 +481,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
                     loadReminders()
                 }
                 .addOnFailureListener { e ->
-                    // Usar cadena de recurso
                     Toast.makeText(this, getString(R.string.toast_update_reminder_error, e.message), Toast.LENGTH_LONG).show()
                     Log.e("RemindersActivity", "Error updating reminder", e)
                     progressBarEdit.visibility = View.GONE
@@ -536,17 +497,14 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
 
     private fun updateDateDisplay(textView: TextView, calendar: Calendar) {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        // Usar cadena de recurso y dividirla para obtener la etiqueta "Fecha"
         textView.text = "${getString(R.string.selected_date_placeholder).split(":")[0]}: ${dateFormat.format(calendar.time)}"
     }
 
     private fun updateTimeDisplay(textView: TextView, calendar: Calendar) {
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        // Usar cadena de recurso y dividirla para obtener la etiqueta "Hora"
         textView.text = "${getString(R.string.selected_time_placeholder).split(":")[0]}: ${timeFormat.format(calendar.time)}"
     }
 
-    // Muestra un diálogo para compartir el recordatorio con otros usuarios por correo electrónico
     private fun showShareReminderDialog(reminder: Reminder) {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_share_reminder, null)
         val etShareEmails: EditText = dialogView.findViewById(R.id.et_share_emails)
@@ -556,7 +514,7 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
-            .setTitle(getString(R.string.dialog_share_reminder_title)) // Usar cadena de recurso
+            .setTitle(getString(R.string.dialog_share_reminder_title))
             .setCancelable(false)
             .create()
 
@@ -606,15 +564,12 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
                             btnCancelShare.isEnabled = true
 
                             if (successfulLookups > 0) {
-                                // Aquí se envía el recordatorio a los usuarios encontrados
                                 val updatedSharedWith = reminder.sharedWith.toMutableList()
                                 foundUserIds.forEach { targetUid ->
                                     if (!updatedSharedWith.contains(targetUid)) {
                                         updatedSharedWith.add(targetUid)
                                     }
                                 }
-
-                                // Actualizar el recordatorio original para reflejar que se ha compartido
                                 val updatedReminderMap = hashMapOf(
                                     "sharedWith" to updatedSharedWith,
                                     "isShared" to true
@@ -626,23 +581,22 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
                                     .addOnSuccessListener {
                                         Log.d("RemindersActivity", "Recordatorio actualizado en Firestore con nuevos usuarios compartidos.")
                                         Toast.makeText(this, getString(R.string.toast_shared_with_users, successfulLookups), Toast.LENGTH_SHORT).show()
-                                        // Enviar invitaciones a cada usuario encontrado
                                         foundUserIds.forEach { targetUserId ->
                                             val invitation = Invitation(
                                                 reminderId = reminder.id,
                                                 creatorId = auth.currentUser?.uid ?: "",
                                                 reminderTitle = reminder.title,
                                                 reminderTimestamp = reminder.timestamp,
-                                                reminderType = reminder.type, // Usar typeKey para la invitación
-                                                reminderCategory = reminder.category, // Usar categoryKey para la invitación
-                                                sharedFromUserName = currentUserName // Usar el nombre cargado del usuario actual
+                                                reminderType = reminder.type,
+                                                reminderCategory = reminder.category,
+                                                sharedFromUserName = currentUserName
                                             )
                                             firestore.collection("users").document(targetUserId).collection("userInvitations")
                                                 .add(invitation)
                                                 .addOnSuccessListener { Log.d("RemindersActivity", "Invitation sent to $targetUserId successfully!") }
                                                 .addOnFailureListener { e -> Log.e("RemindersActivity", "Failed to send invitation to $targetUserId: ${e.message}", e) }
                                         }
-                                        loadReminders() // Recargar para actualizar la UI si es necesario (ej. el indicador de compartido)
+                                        loadReminders()
                                         dialog.dismiss()
                                     }
                                     .addOnFailureListener { e ->
@@ -678,7 +632,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
 
     private fun showDeleteConfirmationDialog(reminder: Reminder) {
         AlertDialog.Builder(this)
-            // Usar cadenas de recurso
             .setTitle(getString(R.string.delete_reminder_title))
             .setMessage(getString(R.string.delete_reminder_confirmation, reminder.title))
             .setPositiveButton(getString(R.string.yes_delete_button)) { dialog, _ ->
@@ -694,7 +647,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
     private fun deleteReminder(reminderId: String) {
         val userId = auth.currentUser?.uid
         if (userId == null) {
-            // Usar cadena de recurso
             Toast.makeText(this, getString(R.string.error_user_not_authenticated), Toast.LENGTH_SHORT).show()
             return
         }
@@ -703,7 +655,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
             .document(reminderId)
             .delete()
             .addOnSuccessListener {
-                // Usar cadena de recurso
                 Toast.makeText(this, getString(R.string.reminder_deleted_success), Toast.LENGTH_SHORT).show()
                 cancelReminderNotification(reminderId)
                 firebaseAnalytics.logEvent("delete_reminder") {
@@ -713,7 +664,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
                 loadReminders()
             }
             .addOnFailureListener { e ->
-                // Usar cadena de recurso
                 Toast.makeText(this, getString(R.string.error_deleting_reminder, e.message), Toast.LENGTH_LONG).show()
                 Log.e("RemindersActivity", "Error deleting reminder", e)
             }
@@ -727,14 +677,11 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
             timeInMillis = reminder.timestamp
             add(Calendar.MINUTE, -5)
         }.timeInMillis
-
-        // Obtener la categoría traducida para la notificación
         val translatedCategory = ReminderConstants.getCategoryDisplayName(this, reminder.category)
 
         if (notificationTime <= System.currentTimeMillis()) {
             Log.d("RemindersActivity", "Notification time for ${reminder.title} is in the past or too soon, showing immediately.")
             notificationHelper.showNotification(
-                // Usar cadenas de recurso
                 getString(R.string.notification_title_reminder, reminder.title),
                 getString(R.string.notification_message_past_due, translatedCategory),
                 notificationId
@@ -743,9 +690,8 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
         }
 
         val intent = Intent(this, NotificationPublisher::class.java).apply {
-            // Pasar la clave de la categoría y el tipo para que el NotificationPublisher pueda traducirlos
             putExtra(NotificationPublisher.REMINDER_TITLE_EXTRA, reminder.title)
-            putExtra(NotificationPublisher.REMINDER_MESSAGE_EXTRA_KEY, reminder.category) // Pasa la clave
+            putExtra(NotificationPublisher.REMINDER_MESSAGE_EXTRA_KEY, reminder.category)
             putExtra(NotificationPublisher.NOTIFICATION_ID_EXTRA, notificationId)
             putExtra(NotificationPublisher.REMINDER_ID_EXTRA, reminderId)
         }
@@ -766,7 +712,6 @@ class RemindersActivity : BaseActivity(), RemindersAdapter.OnReminderOptionsClic
             Log.d("RemindersActivity", "Scheduled notification for ${reminder.title} at ${SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date(notificationTime))}")
         } catch (e: SecurityException) {
             Log.e("RemindersActivity", "SecurityException al programar alarma: ${e.message}", e)
-            // Usar cadena de recurso
             Toast.makeText(this, getString(R.string.error_scheduling_alarm), Toast.LENGTH_LONG).show()
         }
     }

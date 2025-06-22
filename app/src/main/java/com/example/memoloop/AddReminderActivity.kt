@@ -7,14 +7,14 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Base64 // Importación necesaria para Base64
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import android.app.Activity
-import android.net.Uri // Importación necesaria para Uri
-import androidx.core.content.FileProvider // Importación necesaria para FileProvider
+import android.net.Uri
+import androidx.core.content.FileProvider
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -25,8 +25,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
-import com.example.memoloop.ImgbbResponse // Asumo que estas clases están definidas en tu proyecto
-import com.example.memoloop.network.ImgbbService // Asumo que estas clases están definidas en tu proyecto
+import com.example.memoloop.ImgbbResponse
+import com.example.memoloop.network.ImgbbService
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -36,12 +36,9 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-import java.io.File // Importación necesaria para File
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-
-// Se asume que ReminderConstants, Reminder, ImgbbResponse, ImgbbService e Invitation
-// están importadas de sus propios archivos.
 
 class AddReminderActivity : BaseActivity() {
 
@@ -55,7 +52,7 @@ class AddReminderActivity : BaseActivity() {
     private lateinit var tvSelectedTime: TextView
     private lateinit var btnSelectDate: Button
     private lateinit var btnSelectTime: Button
-    private lateinit var btnSelectImage: Button // Botón para seleccionar/tomar imagen
+    private lateinit var btnSelectImage: Button
     private lateinit var spinnerCategory: Spinner
     private lateinit var spinnerFrequency: Spinner
     private lateinit var btnAddReminder: Button
@@ -69,8 +66,8 @@ class AddReminderActivity : BaseActivity() {
     private var currentUserName: String = ""
     private var selectedLatitude: Double? = null
     private var selectedLongitude: Double? = null
-    private var selectedImageUri: Uri? = null // Uri de la imagen seleccionada de galería o cámara
-    private var capturedImageUri: Uri? = null // Uri temporal para la imagen tomada con la cámara
+    private var selectedImageUri: Uri? = null
+    private var capturedImageUri: Uri? = null
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(LanguageManager.updateBaseContextLocale(newBase!!))
@@ -97,7 +94,7 @@ class AddReminderActivity : BaseActivity() {
         loadCurrentUserName()
 
         val isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
-        setupSaveButton(isEditMode) // Configura el texto y listener del botón Add/Edit
+        setupSaveButton(isEditMode)
         if (isEditMode) {
             supportActionBar?.title = getString(R.string.edit_reminder_toolbar_title)
             loadReminderData()
@@ -122,8 +119,6 @@ class AddReminderActivity : BaseActivity() {
         val typeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerFrequency.adapter = typeAdapter
-
-        // Establecer selección en el spinner de categoría si existe
         selectedCategory?.let { categoryKey ->
             val categoryDisplayName = ReminderConstants.getCategoryDisplayName(this, categoryKey)
             val categoryPosition = categories.indexOf(categoryDisplayName)
@@ -133,8 +128,6 @@ class AddReminderActivity : BaseActivity() {
                 Log.w("AddReminder", "Categoría no encontrada en el array: $categoryDisplayName (key: $categoryKey)")
             }
         }
-
-        // Establecer selección en el spinner de tipo si existe
         selectedType?.let { typeKey ->
             val typeDisplayName = ReminderConstants.getTypeDisplayName(this, typeKey)
             val typePosition = types.indexOf(typeDisplayName)
@@ -167,13 +160,9 @@ class AddReminderActivity : BaseActivity() {
 
         sharedWithUserIds = intent.getStringArrayListExtra("SHARED_WITH")?.toMutableList() ?: mutableListOf()
 
-        // Si hay una imagen URL, podrías querer cargarla o mostrar un indicador de que ya existe una imagen
         val imageUrl = intent.getStringExtra("IMAGE_URL")
         if (!imageUrl.isNullOrEmpty()) {
-            // Aquí podrías cargar la imagen en un ImageView si tu layout lo tuviera.
-            // Por ahora, solo logueamos que hay una URL.
             Log.d("AddReminderActivity", "Reminder has existing image URL: $imageUrl")
-            // Podrías cambiar el texto del botón btnSelectImage a "Cambiar Imagen"
             btnSelectImage.text = getString(R.string.change_image_button)
         }
     }
@@ -195,7 +184,7 @@ class AddReminderActivity : BaseActivity() {
         progressBar = findViewById(R.id.progress_bar)
         btnShareReminder = findViewById(R.id.btn_share_reminder)
         btnSelectLocation = findViewById(R.id.btn_select_location)
-        btnSelectImage = findViewById(R.id.btn_select_image) // Inicializa el botón de imagen
+        btnSelectImage = findViewById(R.id.btn_select_image)
 
         btnSelectLocation.setOnClickListener {
             val intent = Intent(this, MapPickerActivity::class.java)
@@ -203,20 +192,17 @@ class AddReminderActivity : BaseActivity() {
         }
 
         btnSelectImage.setOnClickListener {
-            showImageSourceDialog() // Muestra diálogo para seleccionar fuente de imagen
+            showImageSourceDialog()
         }
     }
 
     private fun setupSpinners() {
-        // La configuración inicial de spinners se realiza aquí si no hay selección previa (modo add)
-        // La lógica para selección existente se maneja en setupSpinnersWithSelection
         setupSpinnersWithSelection(null, null)
     }
 
     private fun setupClickListeners() {
         btnSelectDate.setOnClickListener { showDatePicker() }
         btnSelectTime.setOnClickListener { showTimePicker() }
-        // btnAddReminder.setOnClickListener { addReminder() } // Se mueve a setupSaveButton para manejar modo edición
         btnShareReminder.setOnClickListener { showShareReminderDialog() }
     }
 
@@ -293,7 +279,7 @@ class AddReminderActivity : BaseActivity() {
                     Toast.makeText(this, getString(R.string.toast_no_coordinates_received), Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(this, getString(R.string.toast_no_map_data_received), Toast.LENGTH_SHORT).show() // Corregido el mensaje
+                Toast.makeText(this, getString(R.string.toast_no_map_data_received), Toast.LENGTH_SHORT).show()
             }
         } else {
             Toast.makeText(this, getString(R.string.toast_operation_cancelled), Toast.LENGTH_SHORT).show()
@@ -323,12 +309,12 @@ class AddReminderActivity : BaseActivity() {
     private fun openCamera() {
         val imageFile = File.createTempFile("camera_photo", ".jpg", cacheDir).apply {
             createNewFile()
-            deleteOnExit() // Asegura que el archivo temporal se elimine al salir
+            deleteOnExit()
         }
 
         capturedImageUri = FileProvider.getUriForFile(
             this,
-            "${packageName}.fileprovider", // Asegúrate de que este authority coincida con tu manifest
+            "${packageName}.fileprovider",
             imageFile
         )
 
@@ -465,7 +451,6 @@ class AddReminderActivity : BaseActivity() {
         val isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
         val reminderId = if (isEditMode) intent.getStringExtra("REMINDER_ID") else null
 
-        // Convertir nombres de visualización a claves antes de guardar
         val selectedCategoryKey = ReminderConstants.getCategoryKeyFromDisplayName(this, selectedCategoryDisplayName)
         val selectedTypeKey = ReminderConstants.getTypeKeyFromDisplayName(this, selectedFrequencyDisplayName)
 
@@ -508,7 +493,7 @@ class AddReminderActivity : BaseActivity() {
                 sharedFromUserName = currentUserName,
                 latitude = selectedLatitude,
                 longitude = selectedLongitude,
-                imageUrl = imageUrl ?: intent.getStringExtra("IMAGE_URL") // Mantener la imagen existente si no se sube una nueva
+                imageUrl = imageUrl ?: intent.getStringExtra("IMAGE_URL")
             )
 
             if (isEditMode && reminderId != null) {
@@ -592,7 +577,6 @@ class AddReminderActivity : BaseActivity() {
             }
         }
 
-        // Subir imagen a imgbb si existe una nueva imagen seleccionada
         if (selectedImageUri != null) {
             val base64Image = uriToBase64(this, selectedImageUri!!)
 
@@ -603,7 +587,6 @@ class AddReminderActivity : BaseActivity() {
 
             val service = retrofit.create(ImgbbService::class.java)
             val requestBody = RequestBody.create(MultipartBody.FORM, base64Image)
-            // Reemplaza "YOUR_IMGBB_API_KEY" con tu clave real de ImgBB
             val call = service.uploadImage("a22a878e6ccb5e3bcfd0a26cd4f5ac6c", requestBody)
 
             call.enqueue(object : Callback<ImgbbResponse> {
@@ -625,7 +608,6 @@ class AddReminderActivity : BaseActivity() {
                 }
             })
         } else {
-            // No hay nueva imagen, guardar con la imagen existente (en modo edición) o sin imagen
             saveReminderToFirestore(null)
         }
     }
@@ -706,7 +688,7 @@ class AddReminderActivity : BaseActivity() {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
             val bytes = inputStream.readBytes()
             Base64.encodeToString(bytes, Base64.DEFAULT)
-        } ?: "" // Devuelve una cadena vacía si no se puede abrir el stream
+        } ?: ""
     }
 
     private fun clearForm() {
@@ -720,15 +702,15 @@ class AddReminderActivity : BaseActivity() {
         sharedWithUserIds.clear()
         selectedLatitude = null
         selectedLongitude = null
-        selectedImageUri = null // Limpia la URI de la imagen
-        btnSelectImage.text = getString(R.string.select_image_button) // Restablece el texto del botón
+        selectedImageUri = null
+        btnSelectImage.text = getString(R.string.select_image_button)
     }
 
     private fun setLoadingState(isLoading: Boolean) {
         btnAddReminder.isEnabled = !isLoading
         btnShareReminder.isEnabled = !isLoading
         btnSelectLocation.isEnabled = !isLoading
-        btnSelectImage.isEnabled = !isLoading // Deshabilita/habilita el botón de imagen
+        btnSelectImage.isEnabled = !isLoading
         progressBar.isVisible = isLoading
         if (isLoading) {
             btnAddReminder.text = ""

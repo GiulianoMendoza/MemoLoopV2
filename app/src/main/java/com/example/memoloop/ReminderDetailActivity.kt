@@ -218,7 +218,7 @@ class ReminderDetailActivity : BaseActivity() {
             AlertDialog.Builder(this)
                 .setTitle(getString(R.string.delete_reminder_title_dialog))
                 .setMessage(getString(R.string.delete_reminder_confirmation_detail))
-                .setPositiveButton(getString(R.string.yes_delete_button_short)) { _, _ -> deleteReminder() } // Reutilizar 'yes_delete_button_short'
+                .setPositiveButton(getString(R.string.yes_delete_button_short)) { _, _ -> deleteReminder() }
                 .setNegativeButton(getString(R.string.no_cancel_button), null)
                 .show()
         }

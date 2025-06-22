@@ -20,7 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 
-class WelcomeActivity : BaseActivity() { // Asegúrate de que herede de BaseActivity
+class WelcomeActivity : BaseActivity() {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     private lateinit var auth: FirebaseAuth
@@ -33,7 +33,7 @@ class WelcomeActivity : BaseActivity() { // Asegúrate de que herede de BaseActi
     private lateinit var toolbarWelcome: Toolbar
     private lateinit var btnViewInvitationsWelcome: Button
 
-    private val scope = CoroutineScope(Dispatchers.Main + Job()) // CoroutineScope para operaciones asíncronas
+    private val scope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(LanguageManager.updateBaseContextLocale(newBase!!))
@@ -41,16 +41,12 @@ class WelcomeActivity : BaseActivity() { // Asegúrate de que herede de BaseActi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Llama a setChildContentView de BaseActivity para inflar tu layout
         setChildContentView(R.layout.activity_welcome)
 
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
         initViews()
-
-        // setupBottomNavigationBar() ya se llama desde BaseActivity.onCreate()
-        // No es necesario llamarlo aquí de nuevo si ya está en BaseActivity.
 
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
             param(FirebaseAnalytics.Param.SCREEN_NAME, "WelcomeActivity")
@@ -101,7 +97,6 @@ class WelcomeActivity : BaseActivity() { // Asegúrate de que herede de BaseActi
 
         scope.launch {
             try {
-                // Verificar si el usuario tiene recordatorios
                 val reminderSnapshot = firestore.collection("users")
                     .document(userId)
                     .collection("reminders")
@@ -110,14 +105,13 @@ class WelcomeActivity : BaseActivity() { // Asegúrate de que herede de BaseActi
                     .await()
                 val hasReminders = !reminderSnapshot.isEmpty
 
-                // Verificar invitaciones pendientes
                 val invitationSnapshot = firestore.collection("users")
                     .document(userId)
                     .collection("userInvitations")
                     .limit(1)
                     .get()
                     .await()
-                val hasPendingInvitations = !invitationSnapshot.isEmpty // <-- Definición de hasPendingInvitations
+                val hasPendingInvitations = !invitationSnapshot.isEmpty
 
                 withContext(Dispatchers.Main) {
                     setLoadingState(false)
@@ -128,7 +122,6 @@ class WelcomeActivity : BaseActivity() { // Asegúrate de que herede de BaseActi
                         finish()
                     } else {
                         Log.d("WelcomeActivityDebug", "No personal reminders found.")
-                        // Pasa hasPendingInvitations correctamente aquí
                         setupNoRemindersWelcomeScreenContent(userId, hasPendingInvitations)
                     }
                 }
@@ -137,17 +130,11 @@ class WelcomeActivity : BaseActivity() { // Asegúrate de que herede de BaseActi
                     setLoadingState(false)
                     Log.e("WelcomeActivity", getString(R.string.error_checking_personal_reminders_log, e.message), e)
                     Toast.makeText(this@WelcomeActivity, getString(R.string.error_loading_reminders, e.message), Toast.LENGTH_LONG).show()
-                    // Si hay un error, asumimos que no hay invitaciones para evitar otro error.
                     setupNoRemindersWelcomeScreenContent(userId, false)
                 }
             }
         }
     }
-
-    // Esta función ya no es necesaria como función separada si toda la lógica
-    // de verificación de recordatorios e invitaciones se maneja en checkUserRemindersAndSetupUI.
-    // Si aún la tienes definida en tu archivo, puedes eliminarla.
-    // private fun checkForPendingInvitationsAndSetupWelcomeScreen(userId: String) { ... }
 
     private fun setupNoRemindersWelcomeScreenContent(userId: String, hasInvitations: Boolean) {
         loadUserName(userId)
@@ -230,6 +217,6 @@ class WelcomeActivity : BaseActivity() { // Asegúrate de que herede de BaseActi
 
     override fun onDestroy() {
         super.onDestroy()
-        scope.cancel() // Cancela todas las coroutines en este scope
+        scope.cancel()
     }
 }

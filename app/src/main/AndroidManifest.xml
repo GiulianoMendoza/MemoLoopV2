@@ -5,35 +5,16 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <!-- Permisos de almacenamiento para Android 12 (API 31) y anteriores -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" /> <!-- maxSdkVersion 29 es correcto para no pedirlo en Android 10+ por Scoped Storage -->
-
-    <!-- Permisos de almacenamiento/galería para Android 13 (API 33) y superiores -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-
-    <!-- Permisos de ubicación -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <!-- Permisos de red -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!-- Permiso para Wake Lock (si lo usa NotificationPublisher, que es común) -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <!-- Permiso de cámara -->
     <uses-permission android:name="android.permission.CAMERA" />
-
-    <!-- Permiso para usar alarmas exactas (para API 31+ y para API < 31) -->
-    <!-- Se usan ambos porque SCHEDULE_EXACT_ALARM fue deprecado en Android 14 (API 34)
-         y reemplazado por USE_EXACT_ALARM. tools:targetApi="s" es para API 31+. -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" tools:targetApi="s"/>
-
-
-    <!-- Declaración de características de hardware (no permisos, pero importantes para disponibilidad) -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
